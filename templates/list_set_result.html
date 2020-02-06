@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>批量设置结果</title>
+</head>
+<body>
+
+{% if msg.code == 200 %}
+
+<table>
+    <tr><td>{{ msg.content }}</td></tr>
+
+    {% if msg.error %}
+    <tr><td colspan="2">以下对象还未入库，需先入库，才能批量设置名单</td></tr>
+    {% for tmp in msg.error %}
+
+        <tr><td>{{ tmp.0 }}</td><td>{{ tmp.1 }}</td></tr>
+
+
+    {% endfor %}
+    {% endif %}
+        </table>
+
+    {% elif msg.code == 305 %}
+    {{msg.error}}
+
+{% endif %}
+<br><a href='/'>首页</a>
+</body>
+</html>

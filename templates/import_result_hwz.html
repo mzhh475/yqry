@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>（话务组）导入结果</title>
+    <script type='text/javascript' src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <script>
+        $(function(){
+        $("#select_all").change(function(){
+
+        if($(this).is(':checked')){
+        $("input[name='update_phone']").attr('checked', true);
+        }else{
+        $("input[name='update_phone']").attr('checked', false);
+
+        }
+        });
+
+        });
+
+    </script>
+</head>
+<body>
+
+
+{% if msg.code == 200 %}
+
+<form action="need_update_db_hwz" method="post">
+    {% csrf_token %}
+
+    <input type="hidden" name="upload_file_name" value="{{msg.url}}">
+<table>
+    <tr><th colspan="6">{{msg.content}}</th></tr>
+    <tr><th colspan="6">（话务组）需覆盖更新内容，确定更新，点击下一步</th></tr>
+    <tr><th>全选<input type="checkbox" id="select_all" checked="checked"> </th><th>序号</th><th>手机号
+</th><th>姓名</th><th>身份证号</th><th>所属街道</th><th>当前状态</th><th>数据来源</th></tr>
+
+    {% for tmp in need_update %}
+    <tr><td><input type="checkbox" value="{{tmp.0}}" name="update_phone" checked="checked" ></td>
+        <td>{{ forloop.counter }}</td><td>{{ tmp.0 }}</td><td>{{ tmp.1 }}</td><td>{{ tmp.2 }}</td><td>{{ tmp.3 }}</td>
+        <td>{{ tmp.4 }}</td><td>{{ tmp.5 }}</td></tr>
+
+    {% endfor %}
+    <tr><td colspan="6"><input type="submit" value="覆盖更新"></td></tr>
+
+</table>
+</form>
+
+<div>
+    {% if msg.error %}
+
+    <table>
+    {% for tmp in msg.error %}
+
+        <tr><td>{{ forloop.counter }}</td><td>{{ tmp }}</td></tr>
+
+
+    {% endfor %}
+        </table>
+    {% endif %}
+
+
+
+</div>
+
+    {% elif msg.code == 305 %}
+    {{msg.error}}
+
+{% endif %}
+
+<br><a href='/'>首页</a>
+</body>
+</html>
