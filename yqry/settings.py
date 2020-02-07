@@ -71,6 +71,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'yqry.wsgi.application'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  #默认设置为5M
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 102400 # higher than the count of fields
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases

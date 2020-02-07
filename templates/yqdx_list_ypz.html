@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>数据研判组疫情对象详表</title>
+    <script type='text/javascript' src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <style>
+body,table{
+    font-size:12px;
+}
+table.list_table{
+    border:1px solid #cad9ea;
+    color:#666;
+    empty-cells:show;
+    border-collapse: collapse;
+    margin:0 auto;
+    table-layout:fixed;
+}
+table.list_table th {
+
+	background-repeat::repeat-x;
+	height:30px;
+	color:black;
+}
+table.list_table td{
+	border:1px dashed #cad9ea;
+	word-wrap:break-word;
+	word-break:break-all;
+}
+
+
+    </style>
+    <script>
+$.ajaxSetup({
+            data:{csrfmiddlewaretoken:'{{ csrf_token }}'}
+        })
+        $(function(){
+
+            //重置按钮
+            $("#reset").click(function(){
+                $(".search_input").val("");
+                $("select[name='ssjd'] option[value='全部']").prop("selected", true);
+                $("select[name='status'] option[value='全部']").prop("selected", true);
+                $("select[name='call_detail'] option[value='全部']").prop("selected", true);
+                $("select[name='white_list_flag'] option[value='全部']").prop("selected", true);
+                $("select[name='from_source'] option[value='全部']").prop("selected", true);
+            });
+
+            //设置返回搜索缓存
+            $("select[name='ssjd'] option[value='{{search_cache.ssjd}}']").prop("selected", true);
+            $("select[name='status'] option[value='{{search_cache.status}}']").prop("selected", true);
+            $("select[name='call_detail'] option[value='{{search_cache.call_detail}}']").prop("selected", true);
+            $("select[name='white_list_flag'] option[value='{{search_cache.white_list_flag}}']").prop("selected", true);
+            $("select[name='from_source'] option[value='{{search_cache.from_source}}']").prop("selected", true);
+            //监听导出按钮
+            $("#output").click(function(){
+                $(this).attr("value","导出中")
+                $.post("/yqdx_list_export_ypz", $("#search_form").serialize(),function(data){
+
+                    window.location.href="/download?field="+data['field']+"&filename="+data['filename'];
+                    $("#output").attr("value","导出")
+                },'json');
+            });
+            //疫情对象修改
+            $(".yqdx_mod").click(function(){
+            var id=$(this).attr("id");
+            window.location.href="{%url 'yqdx_mod_ypz' %}?id="+id;
+            });
+            //对象删除
+            $(".yqdx_del").click(function(){
+                var id=$(this).attr("id");
+                if (confirm("确定从库里删除该对象？")){
+                $.get("/yqdx_del_ypz?id="+id,function(data){
+                    if(data["flag"]){
+                    alert("删除成功");
+                    window.location.href="?page=1&size=100"
+                    }else{
+                    alert("删除失败");
+                    }
+                },"json");
+                }
+            });
+
+        });
+
+    </script>
+
+</head>
+<body>
+<div align="center"><a href="/">首页</a>&nbsp;&nbsp;
+    <a href="/dx_import_ypz" target="_blank">批量导入</a>&nbsp;&nbsp;
+
+<!--    <a href="/back_date_whitelist">返回日期批量设置白名单</a>&nbsp;-->
+    <a href="/jjbd_ypz" target="_blank">交集比对</a>&nbsp;&nbsp;
+    <a href="/bddc_ypz" target="_blank">比对导出</a>&nbsp;&nbsp;</div>
+<form method="post" action="/yqdx_list_ypz?page={{now_page}}&size={{size}}" id="search_form">
+    {% csrf_token %}
+<table class="search_table">
+    <tr><th>检索条件</th></tr>
+    <tr><td>手机号</td><td><input name="phone_no" class="search_input" value="{% ifnotequal search_cache.phone_no None %}{{search_cache.phone_no}}{% endifnotequal %}"></td>
+        <td>姓名</td><td><input name="name" class="search_input" placeholder="支持模糊查询" value="{% ifnotequal search_cache.name None %}{{search_cache.name}}{% endifnotequal %}"></td>
+        <td>身份证号</td><td><input name="sfzh" class="search_input" placeholder="支持模糊查询" value="{% ifnotequal search_cache.sfzh None %}{{search_cache.sfzh}}{% endifnotequal %}"></td><td>所属街道</td><td>
+        <select name="ssjd">
+            <option value="全部">全部</option>
+            {% for ssjd_list_tmp in ssjd_list %}
+            <option value="{{ ssjd_list_tmp.ssjd }}">{{ ssjd_list_tmp.ssjd }}</option>
+            {% endfor %}
+        </select>
+    </td></tr>
+    <tr><td>当前状态</td><td>
+        <select name="status">
+            <option value="全部">全部</option>
+            {% for status_list_tmp in status_list %}
+            <option value="{{ status_list_tmp.status }}">{{ status_list_tmp.status }}</option>
+            {% endfor %}
+        </select>
+    </td><td>拨打情况</td><td>
+        <select name="call_detail">
+            <option value="全部">全部</option>
+            {% for call_detail_list_tmp in call_detail_list %}
+            <option value="{{ call_detail_list_tmp.call_detail }}">{{ call_detail_list_tmp.call_detail }}</option>
+            {% endfor %}
+        </select>
+    </td><td>白名单</td><td>
+        <select name="white_list_flag">
+            <option value="全部">全部</option>
+            {% for white_list_flag_list_tmp in white_list_flag_list %}
+            <option value="{{ white_list_flag_list_tmp.type_value }}">{{ white_list_flag_list_tmp.type_name }}</option>
+            {% endfor %}
+        </select>
+    </td><td>数据来源</td><td>
+        <select name="from_source">
+            <option value="全部">全部</option>
+            {% for from_source_list_tmp in from_source_list %}
+            <option value="{{ from_source_list_tmp.from_source }}">{{ from_source_list_tmp.from_source }}</option>
+            {% endfor %}
+        </select>
+    </td></tr>
+<tr><td colspan="4"><input type="submit" value="检索">&nbsp;<td colspan="4"><input type="button" value="重置" id="reset">&nbsp;<td colspan="4"><input type="button" value="导出" id="output"></td></tr>
+</table >
+</form>
+<table width="100%" border="1" class="list_table">
+    <tr><th colspan="21" align="center"><h3 style="color:red;">镇海公安分局疫情人员（数据研判组）对象情况表</h3></th></tr>
+    <tr><td colspan="21" align="right">{{now_page}}/{{total_page}}&nbsp;<a href="/yqdx_list_ypz?page=1&size=100">首页</a>&nbsp;
+        {% if has_pre %}
+        <a href="/yqdx_list_ypz?page={{ pre_num }}&size=100">上一页</a>&nbsp;
+        {% endif %}
+        {% if has_next %}
+        <a href="/yqdx_list_ypz?page={{ next_num }}&size=100">下一页</a>&nbsp;
+        {% endif %}
+        <a href="/yqdx_list_ypz?page={{ total_page }}&size=100">末页</a>&nbsp;总{{total_count}}条</td></tr>
+    <tr><th>序号</th><th>手机号</th><th>姓名</th><th>身份证号</th><th>居住地址</th><th>街道</th><th>武汉</th><th>湖北</th>
+        <th>市内非镇海</th><th>省内非宁波</th><th>省外</th><th>何地返回</th><th>返回日期</th><th>当前状态</th><th>状态备注</th><th>拨打情况</th>
+        <th>自述情况</th><td>数据来源</td><td>白名单</td><td>入库时间</td><td>操作</td></tr>
+
+    {% for tmp in back_page %}
+    <tr><td>{{ forloop.counter }}<td>{{ tmp.phone_no }}</td><td>{{ tmp.name }}</td><td>{{ tmp.sfzh }}</td>
+        <td>{{ tmp.xzdz }}</td><td>{{ tmp.ssjd }}</td><td>{{ tmp.is_wuhan }}</td><td>{{ tmp.is_hubei }}</td>
+        <td>{{ tmp.is_not_zhenhai }}</td><td>{{ tmp.is_not_ningbo }}</td><td>{{ tmp.is_not_zhejiang }}</td>
+        <td>{{ tmp.back_provinces }}{{ tmp.back_city }}</td><td>{{ tmp.back_year }}-{{ tmp.back_month }}-{{ tmp.back_day }}</td>
+        <td>{{ tmp.status }}</td><td>{{ tmp.status_remarks }}</td><td>{{ tmp.call_detail }}</td><td>{{ tmp.self_tell }}</td><td>{{ tmp.from_source }}</td>
+        <td {% ifequal tmp.white_list_flag.type_value 2 %}style="color:red;"{% endifequal %}>{{ tmp.white_list_flag.type_name }}</td><td>{{ tmp.timestamp|date:"Y-m-d H:i:s" }}</td>
+        <td><input type="button" value="改" class="yqdx_mod" id="{{ tmp.id }}">&nbsp;<input type="button" value="删" class="yqdx_del" id="{{ tmp.id }}"></td></tr>
+
+    {% endfor %}
+
+    <tr><td colspan="21" align="right">{{now_page}}/{{total_page}}&nbsp;<a href="/yqdx_list_ypz?page=1&size=100">首页</a>&nbsp;
+        {% if has_pre %}
+        <a href="/yqdx_list_ypz?page={{ pre_num }}&size=100">上一页</a>&nbsp;
+        {% endif %}
+        {% if has_next %}
+        <a href="/yqdx_list_ypz?page={{ next_num }}&size=100">下一页</a>&nbsp;
+        {% endif %}
+        <a href="/yqdx_list_ypz?page={{ total_page }}&size=100">末页</a>&nbsp;总{{total_count}}条</td></tr>
+</table>
+<div id="output_div"></div>
+</body>
+</html>

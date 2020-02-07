@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>(数据研判组)修改结果</title>
+</head>
+<body>
+
+
+{% if msg.code == 200 %}
+
+{{ msg.info }}
+
+    {% elif msg.code == 305 %}
+    {{msg.error}}
+
+{% endif %}
+<br><a href='/'>首页</a>
+<br><a href="yqdx_list_ypz?page=1&size=100">（数据研判组）对象列表</a>
+</body>
+</html>

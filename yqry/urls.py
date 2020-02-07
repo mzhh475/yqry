@@ -51,6 +51,20 @@ urlpatterns = [
     url(r'^yqdx_del_hwz$', views.yqdx_del_hwz, name='yqdx_del_hwz'),
     url(r'^yqdx_mod_db_hwz$', views.yqdx_mod_db_hwz, name='yqdx_mod_db_hwz'),
 
+    # 研判组url
+    url('^dx_import_ypz$', views.dx_import_ypz),
+    url('^muban_upload_ypz$', views.muban_upload_ypz),
+    url('^need_update_db_ypz$', views.need_update_db_ypz),
+    url('^yqdx_list_ypz$', views.yqdx_list_ypz),
+    url('^jjbd_ypz$', views.jjbd_ypz),
+    url('^jjbd_upload_ypz$', views.jjbd_upload_ypz),
+    url('^bddc_ypz$', views.bddc_ypz),
+    url('^bddc_upload_ypz$', views.bddc_upload_ypz),
+    url('^yqdx_list_export_ypz$', views.yqdx_list_export_ypz),
+    url(r'^yqdx_mod_ypz$', views.yqdx_mod_ypz, name='yqdx_mod_ypz'),
+    url(r'^yqdx_del_ypz$', views.yqdx_del_ypz, name='yqdx_del_ypz'),
+    url(r'^yqdx_mod_db_ypz$', views.yqdx_mod_db_ypz, name='yqdx_mod_db_ypz'),
+
 
 
 
