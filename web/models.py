@@ -130,5 +130,27 @@ class yqdx_ypz(models.Model):
     class Meta:
         # 元类
         db_table = 'yqdx_ypz'
-        verbose_name = '疫情对象话务组'
+        verbose_name = '疫情对象研判组'
+        verbose_name_plural = verbose_name  # 去复数形式
+
+
+class yqdx_glz(models.Model):
+    # 疫情人员表
+    name = models.CharField('姓名', max_length=20, null=True)  # 姓名
+    sex = models.CharField('性别', max_length=1, null=True)
+    sfzh = models.CharField('身份证号', max_length=18, null=True)  # 身份证
+    phone_no = models.CharField('手机号', max_length=11, null='空')  # 手机号
+    rzrq = models.CharField('入住日期', max_length=50, null=True)  # 身份证
+    ryrq = models.CharField('入甬日期', max_length=50, null=True)  # 身份证
+    yjjc = models.CharField('预计解除', max_length=50, null=True)  # 身份证
+    sjjc = models.CharField('实际解除', max_length=50, null=True)  # 身份证
+    glwz = models.CharField('隔离位置', max_length=50, null=True)  # 身份证
+    white_list_flag = models.ForeignKey('list_type', to_field='type_value', on_delete=models.SET_DEFAULT, default=0)
+    timestamp = models.DateTimeField('最后更新时间', auto_now=True)
+    from_source = models.CharField('数据来源', max_length=50, default='区隔离数据')
+
+    class Meta:
+        # 元类
+        db_table = 'yqdx_glz'
+        verbose_name = '疫情对象集中隔离组'
         verbose_name_plural = verbose_name  # 去复数形式

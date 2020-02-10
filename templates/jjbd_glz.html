@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>（集中隔离数据库）碰撞比对</title>
+</head>
+<body>
+<form action="/jjbd_upload_glz" method="post" enctype="multipart/form-data" >
+{% csrf_token %}
+    <div>（集中隔离数据库）交集比对（请将手机号放在第一列，姓名第二列）</div>
+    <div>
+    <input type="file" name="excel" id="excel" >
+    比对方式：<select name="bd_type">
+        <option value="1">手机号第一列</option>
+        <option value="2">身份证号第一列</option>
+        <option value="3">手机第一列，姓名第二列</option>
+        <option value="4">备用</option>
+    </select><br><br>
+    <input type="submit" value="比对"></div>
+</form>
+
+<br><a href='/'>首页</a>
+</body>
+</html>

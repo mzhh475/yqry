@@ -36,6 +36,7 @@ urlpatterns = [
     url(r'^yqdx_mod$', views.yqdx_mod, name='yqdx_mod'),
     url(r'^yqdx_del$', views.yqdx_del, name='yqdx_del'),
     url(r'^yqdx_mod_db$', views.yqdx_mod_db, name='yqdx_mod_db'),
+    url(r'^search_all$', views.search_all, name='search_all'),
 
     #话务组url
     url('^dx_import_hwz$', views.dx_import_hwz),
@@ -65,7 +66,21 @@ urlpatterns = [
     url(r'^yqdx_del_ypz$', views.yqdx_del_ypz, name='yqdx_del_ypz'),
     url(r'^yqdx_mod_db_ypz$', views.yqdx_mod_db_ypz, name='yqdx_mod_db_ypz'),
 
+    # 集中隔离数据组url
+    url('^dx_import_glz$', views.dx_import_glz),
+    url('^muban_upload_glz$', views.muban_upload_glz),
+    url('^need_update_db_glz$', views.need_update_db_glz),
+    url('^yqdx_list_glz$', views.yqdx_list_glz),
+    url('^jjbd_glz$', views.jjbd_glz),
+    url('^jjbd_upload_glz$', views.jjbd_upload_glz),
+    url('^bddc_glz$', views.bddc_glz),
+    url('^bddc_upload_glz$', views.bddc_upload_glz),
+    url('^yqdx_list_export_glz$', views.yqdx_list_export_glz),
+    url(r'^yqdx_mod_glz$', views.yqdx_mod_glz, name='yqdx_mod_glz'),
+    url(r'^yqdx_del_glz$', views.yqdx_del_glz, name='yqdx_del_glz'),
+    url(r'^yqdx_mod_db_glz$', views.yqdx_mod_db_glz, name='yqdx_mod_db_glz'),
 
+    url(r'^muban_upload_glz$', views.muban_upload_glz, name='muban_upload_glz'),
 
 
 ]

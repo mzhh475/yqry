@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>集中隔离数据对象详表</title>
+    <script type='text/javascript' src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <style>
+body,table{
+    font-size:12px;
+}
+table.list_table{
+    border:1px solid #cad9ea;
+    color:#666;
+    empty-cells:show;
+    border-collapse: collapse;
+    margin:0 auto;
+    table-layout:fixed;
+    width:100%;
+}
+table.list_table th {
+
+	background-repeat::repeat-x;
+	height:30px;
+	color:black;
+}
+table.list_table td{
+	border:1px dashed #cad9ea;
+	word-wrap:break-word;
+	word-break:break-all;
+}
+
+
+    </style>
+    <script>
+$.ajaxSetup({
+            data:{csrfmiddlewaretoken:'{{ csrf_token }}'}
+        })
+        $(function(){
+
+            //重置按钮
+            $("#reset").click(function(){
+                $(".search_input").val("");
+                $("select[name='ssjd'] option[value='全部']").prop("selected", true);
+                $("select[name='status'] option[value='全部']").prop("selected", true);
+                $("select[name='call_detail'] option[value='全部']").prop("selected", true);
+                $("select[name='white_list_flag'] option[value='全部']").prop("selected", true);
+                $("select[name='from_source'] option[value='全部']").prop("selected", true);
+            });
+
+            //设置返回搜索缓存
+            $("select[name='glwz'] option[value='{{search_cache.glwz}}']").prop("selected", true);
+            $("select[name='white_list_flag'] option[value='{{search_cache.white_list_flag}}']").prop("selected", true);
+            $("select[name='from_source'] option[value='{{search_cache.from_source}}']").prop("selected", true);
+            //监听导出按钮
+            $("#output").click(function(){
+                $(this).attr("value","导出中")
+                $.post("/yqdx_list_export_glz", $("#search_form").serialize(),function(data){
+
+                    window.location.href="/download?field="+data['field']+"&filename="+data['filename'];
+                    $("#output").attr("value","导出")
+                },'json');
+            });
+            //疫情对象修改
+            $(".yqdx_mod").click(function(){
+            var id=$(this).attr("id");
+            window.location.href="{%url 'yqdx_mod_glz' %}?id="+id;
+            });
+            //对象删除
+            $(".yqdx_del").click(function(){
+                var id=$(this).attr("id");
+                if (confirm("确定从库里删除该对象？")){
+                $.get("/yqdx_del_glz?id="+id,function(data){
+                    if(data["flag"]){
+                    alert("删除成功");
+                    window.location.href="?page=1&size=100"
+                    }else{
+                    alert("删除失败");
+                    }
+                },"json");
+                }
+            });
+
+        });
+
+    </script>
+
+</head>
+<body >
+<div align="center"><a href="/">首页</a>&nbsp;&nbsp;
+    <a href="/muban_upload_glz" target="_blank">批量导入</a>&nbsp;&nbsp;
+
+    <a href="/jjbd_glz" target="_blank">交集比对</a>&nbsp;&nbsp;
+    <a href="/bddc_glz" target="_blank">比对导出</a>&nbsp;&nbsp;</div>
+<form method="post" action="/yqdx_list_glz?page={{now_page}}&size={{size}}" id="search_form">
+    {% csrf_token %}
+<table class="search_table">
+    <tr><th>检索条件</th></tr>
+    <tr><td>手机号</td><td><input name="phone_no" class="search_input" value="{% ifnotequal search_cache.phone_no None %}{{search_cache.phone_no}}{% endifnotequal %}"></td>
+        <td>姓名</td><td><input name="name" class="search_input" placeholder="支持模糊查询" value="{% ifnotequal search_cache.name None %}{{search_cache.name}}{% endifnotequal %}"></td>
+        <td>身份证号</td><td><input name="sfzh" class="search_input" placeholder="支持模糊查询" value="{% ifnotequal search_cache.sfzh None %}{{search_cache.sfzh}}{% endifnotequal %}"></td></tr>
+    <tr><td>隔离位置</td><td>
+        <select name="glwz">
+            <option value="全部">全部</option>
+            {% for glwz_list_tmp in glwz_list %}
+            <option value="{{ glwz_list_tmp.glwz }}">{{ glwz_list_tmp.glwz }}</option>
+            {% endfor %}
+        </select>
+    </td><td>白名单</td><td>
+        <select name="white_list_flag">
+            <option value="全部">全部</option>
+            {% for white_list_flag_list_tmp in white_list_flag_list %}
+            <option value="{{ white_list_flag_list_tmp.type_value }}">{{ white_list_flag_list_tmp.type_name }}</option>
+            {% endfor %}
+        </select>
+    </td><td>数据来源</td><td>
+        <select name="from_source">
+            <option value="全部">全部</option>
+            {% for from_source_list_tmp in from_source_list %}
+            <option value="{{ from_source_list_tmp.from_source }}">{{ from_source_list_tmp.from_source }}</option>
+            {% endfor %}
+        </select>
+    </td></tr>
+<tr><td colspan="4"><input type="submit" value="检索">&nbsp;<td colspan="4"><input type="button" value="重置" id="reset">&nbsp;<td colspan="4"><input type="button" value="导出" id="output"></td></tr>
+</table >
+</form>
+<table width="100%"  class="list_table">
+    <tr><th colspan="14" align="center"><h3 style="color:red;">镇海公安分局疫情人员（集中隔离数据）对象情况表</h3></th></tr>
+    <tr><td colspan="14" align="right">{{now_page}}/{{total_page}}&nbsp;<a href="/yqdx_list_glz?page=1&size=100">首页</a>&nbsp;
+        {% if has_pre %}
+        <a href="/yqdx_list_glz?page={{ pre_num }}&size=100">上一页</a>&nbsp;
+        {% endif %}
+        {% if has_next %}
+        <a href="/yqdx_list_glz?page={{ next_num }}&size=100">下一页</a>&nbsp;
+        {% endif %}
+        <a href="/yqdx_list_glz?page={{ total_page }}&size=100">末页</a>&nbsp;总{{total_count}}条</td></tr>
+    <tr><th>序号</th><th>手机</th><th>姓名</th><th>身份证号</th><th>性别</th><th>入住日期</th><th>入甬日期</th><th>预计解除</th>
+        <th>实际解除</th><th>隔离位置</th><th>数据来源</th><th>白名单</th><td>入库时间</td><td>操作</td></tr>
+
+    {% for tmp in back_page %}
+    <tr><td>{{ forloop.counter }}<td>{{ tmp.phone_no }}</td><td>{{ tmp.name }}</td><td>{{ tmp.sfzh }}</td>
+        <td>{{ tmp.sex }}</td><td>{{ tmp.rzrq }}</td><td>{{ tmp.ryrq }}</td><td>{{ tmp.yjjc }}</td>
+        <td>{{ tmp.sjjc }}</td><td>{{ tmp.glwz }}</td><td>{{ tmp.from_source }}</td>
+        <td {% ifequal tmp.white_list_flag.type_value 2 %}style="color:red;"{% endifequal %}>{{ tmp.white_list_flag.type_name }}</td><td>{{ tmp.timestamp|date:"Y-m-d H:i:s" }}</td>
+        <td><input type="button" value="改" class="yqdx_mod" id="{{ tmp.id }}">&nbsp;<input type="button" value="删" class="yqdx_del" id="{{ tmp.id }}"></td></tr>
+
+    {% endfor %}
+
+    <tr><td colspan="14" align="right">{{now_page}}/{{total_page}}&nbsp;<a href="/yqdx_list_glz?page=1&size=100">首页</a>&nbsp;
+        {% if has_pre %}
+        <a href="/yqdx_list_glz?page={{ pre_num }}&size=100">上一页</a>&nbsp;
+        {% endif %}
+        {% if has_next %}
+        <a href="/yqdx_list_glz?page={{ next_num }}&size=100">下一页</a>&nbsp;
+        {% endif %}
+        <a href="/yqdx_list_glz?page={{ total_page }}&size=100">末页</a>&nbsp;总{{total_count}}条</td></tr>
+</table>
+
+</body>
+</html>

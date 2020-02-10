@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>(集中隔离数据库)数据导入</title>
+    <script type='text/javascript' src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+
+</head>
+<body>
+
+<form action="{% url 'muban_upload_glz' %}" method="post" enctype="multipart/form-data">
+
+{% csrf_token %}
+
+    <table>
+        <tr><th colspan="2">(集中隔离数据库)批量导入模板（<a href="/download?field=muban&filename=jzgl_muban.xls">下载</a>模板）</th></tr>
+
+        <tr><td>第几行开始读取：</td><td>{{ obj.begin_row_num }}<span style="color:red">{{ obj.errors.begin_row_num.0 }}</span></td></tr>
+        <tr><td>输入数据来源：</td><td>{{ obj.from_source }}<span style="color:red">{{ obj.errors.from_source.0 }}</span></td></tr>
+        <tr><td>导入路径：</td><td>{{ obj.excel }}<span style="color:red">{{ obj.errors.excel.0 }}</span></td></tr>
+        <tr><td colspan="2"></td></tr>
+        <tr><td colspan="2"><input type="submit" id="submit" value="保存"></td></tr>
+    </table>
+
+</form>
+
+<br>
+<a href="/">首页</a>
+</body>
+</html>
