@@ -1,50 +1,151 @@
 <!DOCTYPE html>
 <html lang="zh">
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <title>镇海疫情人员数据库-首页</title>
+    <script type='text/javascript' src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <script>
+        $(function(){
+         $("#submit").click(function(){
+            $("#search_result_table").html('');
+            var search_value=$("#search_value").val();
+            $("#search_value").val("");
+            var csrfmiddlewaretoken=$("input[name='csrfmiddlewaretoken']").val();
+
+            if (search_value!=''){
+                $.post("/search_all",{"search_value":search_value,"csrfmiddlewaretoken":csrfmiddlewaretoken},function(data){
+                    $("#search_result_table").append("<tr><th>手机</th><th>姓名</th><th>身份证</th><th>数据库</th><th>来源</th></tr>");
+
+                   $.each(data['back_data_list'],function(i,val){ //两个参数，第一个参数表示遍历的数组的下标，第二个参数表示下标对应的值
+
+                        $("#search_result_table").append("<tr><td>"+val['phone_no']+"</td><td>"+val['name']+"</td><td>"+val['sfzh']+"</td><td>"+val['form_ku']+"</td><td>"+val['from_source']+"</td></tr>");
+                        }
+                        );
+                },"json");
+            }else{
+                alert('输入不能为空');
+            }
+
+
+         });
+
+        });
+
+
+
+    </script>
+
+
 </head>
 <body>
-<table border="1">
-    <tr><th>正式数据</th></tr>
-    <tr><td><a href="/yqdx_list?page=1&size=100">显示数据</a></td></tr>
-    <tr><td><a href="/dx_import" target="_blank">批量导入</a></td></tr>
-    <tr><td><a href="/white_red_list_set" target="_blank">批量白（红）名单设置</a></td></tr>
-<!--    <tr><td><a href="/back_date_whitelist" target="_blank">返回日期批量设置白名单</a></td></tr>-->
-    <tr><td><a href="/jjbd" target="_blank">交集比对,[导出原始比对表]</a></td></tr>
-    <tr><td><a href="/bddc" target="_blank">比对导出,[导出库中数据]</a></td></tr>
-
-</table>
-
-
 <br>
-<br>
-<br>
-<table border="1">
-    <tr><th>话务组数据</th></tr>
-    <tr><td><a href="/yqdx_list_hwz?page=1&size=100">显示数据</a></td></tr>
-    <tr><td><a href="/dx_import_hwz" target="_blank">批量导入</a></td></tr>
+<div align="center">
+    <table width="600px;">
+        <tr><td colspan="2">
+        <input size="60" name="search_value" id="search_value" placeholder="全库检索，支持姓名、手机、身份证其中一项，不支持模糊查询"><input type="button" value="全库检索" id="submit">
+         {% csrf_token %}
+        </td> </tr>
+        <tr><td colspan="2">
+            <table id="search_result_table" border="1">
 
-<!--    <tr><td><a href="/back_date_whitelist" target="_blank">返回日期批量设置白名单</a></td></tr>-->
-    <tr><td><a href="/jjbd_hwz" target="_blank">交集比对,[导出原始比对表]</a></td></tr>
-    <tr><td><a href="/bddc_hwz" target="_blank">比对导出,[导出库中数据]</a></td></tr>
+            </table>
 
-</table>
+        </td></tr>
+        <tr><td>
+            <table border="1" style="float:left;">
+                <tr>
+                    <th>正式数据</th>
+                </tr>
+                <tr>
+                    <td><a href="/yqdx_list?page=1&size=100">显示数据</a></td>
+                </tr>
+                <tr>
+                    <td><a href="/dx_import" target="_blank">批量导入</a></td>
+                </tr>
+                <tr>
+                    <td><a href="/white_red_list_set" target="_blank">批量白（红）名单设置</a></td>
+                </tr>
+                <!--    <tr><td><a href="/back_date_whitelist" target="_blank">返回日期批量设置白名单</a></td></tr>-->
+                <tr>
+                    <td><a href="/jjbd" target="_blank">交集比对,[导出原始比对表]</a></td>
+                </tr>
+                <tr>
+                    <td><a href="/bddc" target="_blank">比对导出,[导出库中数据]</a></td>
+                </tr>
+
+            </table>
+        </td><td>
+            <table border="1" style="float:left;">
+                <tr>
+                    <th>集中隔离数据</th>
+                </tr>
+                <tr>
+                    <td><a href="/yqdx_list_glz?page=1&size=100">显示数据</a></td>
+                </tr>
+                <tr>
+                    <td><a href="/muban_upload_glz" target="_blank">批量导入</a></td>
+                </tr>
+                <tr>
+                    <td><a href="/jjbd_glz" target="_blank">交集比对,[导出原始比对表]</a></td>
+                </tr>
+                <tr>
+                    <td><a href="/bddc_glz" target="_blank">比对导出,[导出库中数据]</a></td>
+                </tr>
+            </table>
+        </td></tr>
+        <tr><td>&nbsp;</td><td></td></tr>
+        <tr>
+            <td>
+                <table border="1">
+                    <tr>
+                        <th>话务组数据</th>
+                    </tr>
+                    <tr>
+                        <td><a href="/yqdx_list_hwz?page=1&size=100">显示数据</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="/dx_import_hwz" target="_blank">批量导入</a></td>
+                    </tr>
+
+                    <!--    <tr><td><a href="/back_date_whitelist" target="_blank">返回日期批量设置白名单</a></td></tr>-->
+                    <tr>
+                        <td><a href="/jjbd_hwz" target="_blank">交集比对,[导出原始比对表]</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="/bddc_hwz" target="_blank">比对导出,[导出库中数据]</a></td>
+                    </tr>
+
+                </table>
+            </td>
+            <td>
+                <table border="1">
+                    <tr>
+                        <th>研判组数据</th>
+                    </tr>
+                    <tr>
+                        <td><a href="/yqdx_list_ypz?page=1&size=100">显示数据</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="/dx_import_ypz" target="_blank">批量导入</a></td>
+                    </tr>
+
+                    <!--    <tr><td><a href="/back_date_whitelist" target="_blank">返回日期批量设置白名单</a></td></tr>-->
+                    <tr>
+                        <td><a href="/jjbd_ypz" target="_blank">交集比对,[导出原始比对表]</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="/bddc_ypz" target="_blank">比对导出,[导出库中数据]</a></td>
+                    </tr>
+
+                </table>
 
 
-<br>
-<br>
-<br>
-<table border="1">
-    <tr><th>研判组数据</th></tr>
-    <tr><td><a href="/yqdx_list_ypz?page=1&size=100">显示数据</a></td></tr>
-    <tr><td><a href="/dx_import_ypz" target="_blank">批量导入</a></td></tr>
+            </td></tr>
 
-<!--    <tr><td><a href="/back_date_whitelist" target="_blank">返回日期批量设置白名单</a></td></tr>-->
-    <tr><td><a href="/jjbd_ypz" target="_blank">交集比对,[导出原始比对表]</a></td></tr>
-    <tr><td><a href="/bddc_ypz" target="_blank">比对导出,[导出库中数据]</a></td></tr>
+    </table>
 
-</table>
-
+</div>
 </body>
+
 </html>
