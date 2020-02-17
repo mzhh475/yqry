@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>返甬预登记数据对象详表</title>
+    <script type='text/javascript' src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <style>
+body,table{
+    font-size:12px;
+}
+table.list_table{
+    border:1px solid #cad9ea;
+    color:#666;
+    empty-cells:show;
+    border-collapse: collapse;
+    margin:0 auto;
+    table-layout:fixed;
+    width:100%;
+}
+table.list_table th {
+
+	background-repeat::repeat-x;
+	height:30px;
+	color:black;
+}
+table.list_table td{
+	border:1px dashed #cad9ea;
+	word-wrap:break-word;
+	word-break:break-all;
+}
+
+
+    </style>
+    <script>
+$.ajaxSetup({
+            data:{csrfmiddlewaretoken:'{{ csrf_token }}'}
+        })
+        $(function(){
+
+            //重置按钮
+            $("#reset").click(function(){
+                $(".search_input").val("");
+                $("select[name='carType'] option[value='全部']").prop("selected", true);
+                $("select[name='startAddress_provinces'] option[value='全部']").prop("selected", true);
+                $("select[name='startAddress_city'] option[value='全部']").prop("selected", true);
+                $("select[name='endAddress_town'] option[value='全部']").prop("selected", true);
+                $("select[name='createDate'] option[value='全部']").prop("selected", true);
+
+
+            });
+
+            //设置返回搜索缓存
+            $("select[name='carType'] option[value='{{search_cache.carType}}']").prop("selected", true);
+            $("select[name='startAddress_provinces'] option[value='{{search_cache.startAddress_provinces}}']").prop("selected", true);
+            $("select[name='startAddress_city'] option[value='{{search_cache.startAddress_city}}']").prop("selected", true);
+            $("select[name='endAddress_town'] option[value='{{search_cache.endAddress_town}}']").prop("selected", true);
+            $("select[name='createDate'] option[value='{{search_cache.createDate}}']").prop("selected", true);
+            //监听导出按钮
+            $("#output").click(function(){
+                $(this).attr("value","导出中")
+                $.post("/yqdx_list_export_fyz", $("#search_form").serialize(),function(data){
+
+                    window.location.href="/download?field="+data['field']+"&filename="+data['filename'];
+                    $("#output").attr("value","导出")
+                },'json');
+            });
+
+        });
+
+    </script>
+
+</head>
+<body >
+<div align="center"><a href="/">首页</a>&nbsp;&nbsp;
+    <a href="/muban_upload_fyz" target="_blank">批量导入</a>&nbsp;&nbsp;
+    <a href="/tongji_fyz" target="_blank">统计</a>
+    <a href="/jjbd_fyz" target="_blank">交集比对</a>
+    <a href="/bddc_fyz" target="_blank">比对导出</a></div>
+<form method="post" action="/yqdx_list_fyz?page={{now_page}}&size={{size}}" id="search_form">
+    {% csrf_token %}
+<table class="search_table">
+    <tr><th>检索条件</th></tr>
+    <tr><td>手机号</td><td><input name="phone_no" class="search_input" value="{% ifnotequal search_cache.phone_no None %}{{search_cache.phone_no}}{% endifnotequal %}"></td>
+        <td>姓名</td><td><input name="name" class="search_input" placeholder="支持模糊查询" value="{% ifnotequal search_cache.name None %}{{search_cache.name}}{% endifnotequal %}"></td>
+        <td>身份证号</td><td><input name="sfzh" class="search_input" placeholder="支持模糊查询" value="{% ifnotequal search_cache.sfzh None %}{{search_cache.sfzh}}{% endifnotequal %}"></td>
+        <td>登记日期</td><td>
+            <select name="createDate">
+            <option value="全部">全部</option>
+            {% for createDate_list_tmp in createDate_list %}
+            <option value="{{ createDate_list_tmp.createDate|date:'Y-m-d' }}">{{ createDate_list_tmp.createDate|date:'Y-m-d' }}</option>
+            {% endfor %}
+        </select>
+        </td>
+    </tr>
+    <tr><td>交通工具</td><td>
+        <select name="carType">
+            <option value="全部">全部</option>
+            {% for carType_list_tmp in carType_list %}
+            <option value="{{ carType_list_tmp.carType }}">{{ carType_list_tmp.carType }}</option>
+            {% endfor %}
+        </select>
+    </td><td>来自省</td><td>
+        <select name="startAddress_provinces">
+            <option value="全部">全部</option>
+            {% for startAddress_provinces_list_tmp in startAddress_provinces_list %}
+            <option value="{{ startAddress_provinces_list_tmp.startAddress_provinces }}">{{ startAddress_provinces_list_tmp.startAddress_provinces }}</option>
+            {% endfor %}
+        </select>
+    </td><td>来自市</td><td>
+        <select name="startAddress_city">
+            <option value="全部">全部</option>
+            {% for startAddress_city_list_tmp in startAddress_city_list %}
+            <option value="{{ startAddress_city_list_tmp.startAddress_city }}">{{ startAddress_city_list_tmp.startAddress_city }}</option>
+            {% endfor %}
+        </select>
+    </td>
+    <td>返回镇街道</td><td>
+        <select name="endAddress_town">
+            <option value="全部">全部</option>
+            {% for endAddress_town_list_tmp in endAddress_town_list %}
+            <option value="{{ endAddress_town_list_tmp.endAddress_town }}">{{ endAddress_town_list_tmp.endAddress_town }}</option>
+            {% endfor %}
+        </select>
+    </td>
+    </tr>
+<tr><td colspan="4"><input type="submit" value="检索">&nbsp;<td colspan="4"><input type="button" value="重置" id="reset">&nbsp;<td colspan="4"><input type="button" value="导出" id="output"></td></tr>
+</table >
+</form>
+<table width="100%"  class="list_table">
+    <tr><th colspan="15" align="center"><h3 style="color:red;">镇海公安分局疫情人员（返甬预登记数据）对象情况表</h3></th></tr>
+    <tr><td colspan="15" align="right">{{now_page}}/{{total_page}}&nbsp;<a href="/yqdx_list_fyz?page=1&size=100">首页</a>&nbsp;
+        {% if has_pre %}
+        <a href="/yqdx_list_fyz?page={{ pre_num }}&size={{size}}">上一页</a>&nbsp;
+        {% endif %}
+        {% if has_next %}
+        <a href="/yqdx_list_fyz?page={{ next_num }}&size={{size}}">下一页</a>&nbsp;
+        {% endif %}
+        <a href="/yqdx_list_fyz?page={{ total_page }}&size={{size}}">末页</a>&nbsp;总{{total_count}}条</td></tr>
+    <tr><th>序号</th><th>手机</th><th>姓名</th><th>身份证号</th><th>现住地址</th><th>工作地址</th><th>车牌/次号</th><th>交通工具</th>
+        <th>来源地</th><th>目的地</th><th>返回详址</th><th>卡口</th><th>返回理由</th><th>登记日期</th><th>数据来源</th></tr>
+
+    {% for tmp in back_page %}
+    <tr><td>{{ forloop.counter }}<td>{{ tmp.phone }}</td><td>{{ tmp.userName }}</td><td>{{ tmp.idCard }}</td>
+        <td>{{ tmp.liveAddress }}</td><td>{{ tmp.workAddress }}</td><td>{{ tmp.carNo }}</td><td>{{ tmp.carType }}</td>
+        <td>{{ tmp.startAddress_provinces }}-{{ tmp.startAddress_city }}-{{ tmp.startAddress_county }}</td><td>{{ tmp.endAddress_county }}-{{ tmp.endAddress_town }}</td><td>{{ tmp.endArea }}</td>
+        <td>{{tmp.kakou}}</td><td>{{tmp.whyGo}}</td> <td>{{ tmp.createTime|date:"Y-m-d H:i:s" }}</td>
+        <td>{{tmp.from_source}}</td></tr>
+
+    {% endfor %}
+
+    <tr><td colspan="15" align="right">{{now_page}}/{{total_page}}&nbsp;<a href="/yqdx_list_fyz?page=1&size=100">首页</a>&nbsp;
+        {% if has_pre %}
+        <a href="/yqdx_list_fyz?page={{ pre_num }}&size={{size}}">上一页</a>&nbsp;
+        {% endif %}
+        {% if has_next %}
+        <a href="/yqdx_list_fyz?page={{ next_num }}&size={{size}}">下一页</a>&nbsp;
+        {% endif %}
+        <a href="/yqdx_list_fyz?page={{ total_page }}&size={{size}}">末页</a>&nbsp;总{{total_count}}条</td></tr>
+</table>
+
+</body>
+</html>

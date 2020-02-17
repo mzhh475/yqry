@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from web import views
+from web import views, views_mzz, views_ypz, views_glz, views_hwz, views_fyz
 from django.contrib import admin
 
 urlpatterns = [
@@ -39,48 +39,79 @@ urlpatterns = [
     url(r'^search_all$', views.search_all, name='search_all'),
 
     #话务组url
-    url('^dx_import_hwz$', views.dx_import_hwz),
-    url('^muban_upload_hwz$', views.muban_upload_hwz),
-    url('^need_update_db_hwz$', views.need_update_db_hwz),
-    url('^yqdx_list_hwz$', views.yqdx_list_hwz),
-    url('^jjbd_hwz$', views.jjbd_hwz),
-    url('^jjbd_upload_hwz$', views.jjbd_upload_hwz),
-    url('^bddc_hwz$', views.bddc_hwz),
-    url('^bddc_upload_hwz$', views.bddc_upload_hwz),
-    url('^yqdx_list_export_hwz$', views.yqdx_list_export_hwz),
-    url(r'^yqdx_mod_hwz$', views.yqdx_mod_hwz, name='yqdx_mod_hwz'),
-    url(r'^yqdx_del_hwz$', views.yqdx_del_hwz, name='yqdx_del_hwz'),
-    url(r'^yqdx_mod_db_hwz$', views.yqdx_mod_db_hwz, name='yqdx_mod_db_hwz'),
+    url('^dx_import_hwz$', views_hwz.dx_import_hwz),
+    url('^muban_upload_hwz$', views_hwz.muban_upload_hwz),
+    url('^need_update_db_hwz$', views_hwz.need_update_db_hwz),
+    url('^yqdx_list_hwz$', views_hwz.yqdx_list_hwz),
+    url('^jjbd_hwz$', views_hwz.jjbd_hwz),
+    url('^jjbd_upload_hwz$', views_hwz.jjbd_upload_hwz),
+    url('^bddc_hwz$', views_hwz.bddc_hwz),
+    url('^bddc_upload_hwz$', views_hwz.bddc_upload_hwz),
+    url('^yqdx_list_export_hwz$', views_hwz.yqdx_list_export_hwz),
+    url(r'^yqdx_mod_hwz$', views_hwz.yqdx_mod_hwz, name='yqdx_mod_hwz'),
+    url(r'^yqdx_del_hwz$', views_hwz.yqdx_del_hwz, name='yqdx_del_hwz'),
+    url(r'^yqdx_mod_db_hwz$', views_hwz.yqdx_mod_db_hwz, name='yqdx_mod_db_hwz'),
 
     # 研判组url
-    url('^dx_import_ypz$', views.dx_import_ypz),
-    url('^muban_upload_ypz$', views.muban_upload_ypz),
-    url('^need_update_db_ypz$', views.need_update_db_ypz),
-    url('^yqdx_list_ypz$', views.yqdx_list_ypz),
-    url('^jjbd_ypz$', views.jjbd_ypz),
-    url('^jjbd_upload_ypz$', views.jjbd_upload_ypz),
-    url('^bddc_ypz$', views.bddc_ypz),
-    url('^bddc_upload_ypz$', views.bddc_upload_ypz),
-    url('^yqdx_list_export_ypz$', views.yqdx_list_export_ypz),
-    url(r'^yqdx_mod_ypz$', views.yqdx_mod_ypz, name='yqdx_mod_ypz'),
-    url(r'^yqdx_del_ypz$', views.yqdx_del_ypz, name='yqdx_del_ypz'),
-    url(r'^yqdx_mod_db_ypz$', views.yqdx_mod_db_ypz, name='yqdx_mod_db_ypz'),
+    url('^dx_import_ypz$', views_ypz.dx_import_ypz),
+    url('^muban_upload_ypz$', views_ypz.muban_upload_ypz),
+    url('^need_update_db_ypz$', views_ypz.need_update_db_ypz),
+    url('^yqdx_list_ypz$', views_ypz.yqdx_list_ypz),
+    url('^jjbd_ypz$', views_ypz.jjbd_ypz),
+    url('^jjbd_upload_ypz$', views_ypz.jjbd_upload_ypz),
+    url('^bddc_ypz$', views_ypz.bddc_ypz),
+    url('^bddc_upload_ypz$', views_ypz.bddc_upload_ypz),
+    url('^yqdx_list_export_ypz$', views_ypz.yqdx_list_export_ypz),
+    url(r'^yqdx_mod_ypz$', views_ypz.yqdx_mod_ypz, name='yqdx_mod_ypz'),
+    url(r'^yqdx_del_ypz$', views_ypz.yqdx_del_ypz, name='yqdx_del_ypz'),
+    url(r'^yqdx_mod_db_ypz$', views_ypz.yqdx_mod_db_ypz, name='yqdx_mod_db_ypz'),
 
     # 集中隔离数据组url
-    url('^dx_import_glz$', views.dx_import_glz),
-    url('^muban_upload_glz$', views.muban_upload_glz),
-    url('^need_update_db_glz$', views.need_update_db_glz),
-    url('^yqdx_list_glz$', views.yqdx_list_glz),
-    url('^jjbd_glz$', views.jjbd_glz),
-    url('^jjbd_upload_glz$', views.jjbd_upload_glz),
-    url('^bddc_glz$', views.bddc_glz),
-    url('^bddc_upload_glz$', views.bddc_upload_glz),
-    url('^yqdx_list_export_glz$', views.yqdx_list_export_glz),
-    url(r'^yqdx_mod_glz$', views.yqdx_mod_glz, name='yqdx_mod_glz'),
-    url(r'^yqdx_del_glz$', views.yqdx_del_glz, name='yqdx_del_glz'),
-    url(r'^yqdx_mod_db_glz$', views.yqdx_mod_db_glz, name='yqdx_mod_db_glz'),
+    url('^dx_import_glz$', views_glz.dx_import_glz),
+    url('^muban_upload_glz$', views_glz.muban_upload_glz),
+    url('^need_update_db_glz$', views_glz.need_update_db_glz),
+    url('^yqdx_list_glz$', views_glz.yqdx_list_glz),
+    url('^jjbd_glz$', views_glz.jjbd_glz),
+    url('^jjbd_upload_glz$', views_glz.jjbd_upload_glz),
+    url('^bddc_glz$', views_glz.bddc_glz),
+    url('^bddc_upload_glz$', views_glz.bddc_upload_glz),
+    url('^yqdx_list_export_glz$', views_glz.yqdx_list_export_glz),
+    url(r'^yqdx_mod_glz$', views_glz.yqdx_mod_glz, name='yqdx_mod_glz'),
+    url(r'^yqdx_del_glz$', views_glz.yqdx_del_glz, name='yqdx_del_glz'),
+    url(r'^yqdx_mod_db_glz$', views_glz.yqdx_mod_db_glz, name='yqdx_mod_db_glz'),
 
-    url(r'^muban_upload_glz$', views.muban_upload_glz, name='muban_upload_glz'),
+    url(r'^muban_upload_glz$', views_glz.muban_upload_glz, name='muban_upload_glz'),
+
+    #门诊组url
+    url('^dx_import_mzz$', views_mzz.dx_import_mzz),
+    url('^muban_upload_mzz$', views_mzz.muban_upload_mzz),
+    url('^need_update_db_mzz$', views_mzz.need_update_db_mzz),
+    url('^yqdx_list_mzz$', views_mzz.yqdx_list_mzz),
+    url('^jjbd_mzz$', views_mzz.jjbd_mzz),
+    url('^jjbd_upload_mzz$', views_mzz.jjbd_upload_mzz),
+    url('^bddc_mzz$', views_mzz.bddc_mzz),
+    url('^bddc_upload_mzz$', views_mzz.bddc_upload_mzz),
+    url('^yqdx_list_export_mzz$', views_mzz.yqdx_list_export_mzz),
+    url(r'^yqdx_mod_mzz$', views_mzz.yqdx_mod_mzz, name='yqdx_mod_mzz'),
+    url(r'^yqdx_del_mzz$', views_mzz.yqdx_del_mzz, name='yqdx_del_mzz'),
+    url(r'^yqdx_mod_db_mzz$', views_mzz.yqdx_mod_db_mzz, name='yqdx_mod_db_mzz'),
+
+    #返甬人员url
+    url('^dx_import_fyz$', views_fyz.dx_import_fyz),
+    url('^tongbu$', views_fyz.tongbu),
+    url('^yqdx_list_fyz$', views_fyz.yqdx_list_fyz),
+    url('^yqdx_list_export_fyz$', views_fyz.yqdx_list_export_fyz),
+    url('^jjbd_fyz$', views_fyz.jjbd_fyz),
+    url('^jjbd_upload_fyz$', views_fyz.jjbd_upload_fyz),
+    url('^bddc_fyz$', views_fyz.bddc_fyz),
+    url('^bddc_upload_fyz$', views_fyz.bddc_upload_fyz),
+    url('^zzq_fyz$', views_fyz.zzq_fyz_manager),
+    url('^zzq_fyz_db$', views_fyz.zzq_fyz_db),
+    url('^tongji_fyz$', views_fyz.tongji_fyz),
+
+
+
+
 
 
 ]

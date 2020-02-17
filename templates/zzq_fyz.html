@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>返甬预登记统计-重灾区管理</title>
+    <script type='text/javascript' src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <script>
+        $(function(){
+        {% for zzq_provinces_list_tmp in zzq_provinces_list %}
+        $("input[value='{{zzq_provinces_list_tmp.startAddress_provinces}}']").attr('checked', true);
+        {% endfor %}
+        {% for zzq_city_list_tmp in zzq_city_list %}
+        $("input[value='{{zzq_city_list_tmp.startAddress_city}}']").attr('checked', true);
+        {% endfor %}
+        });
+
+
+    </script>
+</head>
+<body>
+<form method="post" action="zzq_fyz_db">
+     {% csrf_token %}
+<table border="1">
+    <tr><th>重灾区管理</th></tr>
+    <tr><td style="color:red;">当前重灾区省：
+    {% for zzq_provinces_list_tmp in zzq_provinces_list %}
+        <span>{{zzq_provinces_list_tmp.startAddress_provinces}}</span>
+        {% endfor %}
+    </td></tr><tr><td>
+    {% for startAddress_provinces_list_tmp in startAddress_provinces_list %}
+    <label><input type="checkbox" name="zzq_provinces_list" value="{{startAddress_provinces_list_tmp.startAddress_provinces}}">{{startAddress_provinces_list_tmp.startAddress_provinces}}</label>&nbsp;&nbsp;
+    {% endfor %}</td></tr>
+    <tr><td style="color:red;">当前重灾区市：
+    {% for zzq_city_list_tmp in zzq_city_list %}
+        <span>{{zzq_city_list_tmp.startAddress_city}}</span>
+        {% endfor %}
+    </td></tr><tr><td>
+    {% for startAddress_city_list_tmp in startAddress_city_list %}
+    <label><input type="checkbox" name="zzq_city_list" value="{{startAddress_city_list_tmp.startAddress_city}}">{{startAddress_city_list_tmp.startAddress_city}}</label>&nbsp;&nbsp;
+    {% endfor %}</td></tr>
+    <tr><td align="center"><input type="reset" value="重置">&nbsp;<input type="submit" value="提交"> &nbsp;</td></tr>
+</table>
+</form>
+</body>
+</html>

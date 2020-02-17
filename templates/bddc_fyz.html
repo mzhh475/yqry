@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>（返甬预登记数据）比对导出库中数据</title>
+</head>
+<body>
+<form action="/bddc_upload_fyz" method="post" enctype="multipart/form-data" >
+{% csrf_token %}
+    <div>(返甬预登记数据)库中交集比对</div>
+    <input type="file" name="excel" id="excel" >
+    比对方式：<select name="bd_type">
+        <option value="1">手机号第一列</option>
+        <option value="2">身份证号第一列</option>
+        <option value="3">手机第一列，姓名第二列</option>
+        <option value="4">备用</option>
+    </select><br><br>
+    <input type="submit" value="比对">
+</form>
+
+<br><a href='/'>首页</a>
+</body>
+</html>

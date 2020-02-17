@@ -7,64 +7,26 @@ from django.views.decorators.csrf import csrf_protect
 from django.db.utils import DataError
 from django.core.paginator import Paginator
 from yqry import settings
-from .models import yqdx, list_type, yqdx_hwz, yqdx_ypz, yqdx_glz, yqdx_mzz, yqdx_fyz
+from .models import  list_type, yqdx_mzz
 import xlsxwriter
 from django.http import FileResponse
 from django.utils.http import urlquote
-from django.db.models import Q
+
 from django.views.decorators.cache import cache_page
 
 
 # Create your views here.
 
-def index(request):
-    return render(request, 'index.html', )
+################门诊组#################
+
+def dx_import_mzz(request):
+    return render(request, 'import_mzz.html')
 
 
-def dx_import(request):
-    return render(request, 'import.html')
-
-
-# 全库检索
-def search_all(request):
-    back_data_list = []
-    search_value = request.POST.get('search_value')
-    queryset = yqdx.objects.filter(Q(phone_no=search_value) | Q(name=search_value) | Q(sfzh=search_value)).distinct()
-    for qs in queryset:
-        back_data_list.append({"phone_no": qs.phone_no, "name": qs.name, 'sfzh': qs.sfzh, "form_ku": '正式库',
-                               'from_source': qs.from_source})
-    queryset = yqdx_hwz.objects.filter(
-        Q(phone_no=search_value) | Q(name=search_value) | Q(sfzh=search_value)).distinct()
-    for qs in queryset:
-        back_data_list.append({"phone_no": qs.phone_no, "name": qs.name, 'sfzh': qs.sfzh, "form_ku": '话务组库',
-                               'from_source': qs.from_source})
-    queryset = yqdx_ypz.objects.filter(
-        Q(phone_no=search_value) | Q(name=search_value) | Q(sfzh=search_value)).distinct()
-    for qs in queryset:
-        back_data_list.append({"phone_no": qs.phone_no, "name": qs.name, 'sfzh': qs.sfzh, "form_ku": '研判组库',
-                               'from_source': qs.from_source})
-    queryset = yqdx_glz.objects.filter(
-        Q(phone_no=search_value) | Q(name=search_value) | Q(sfzh=search_value)).distinct()
-    for qs in queryset:
-        back_data_list.append({"phone_no": qs.phone_no, "name": qs.name, 'sfzh': qs.sfzh, "form_ku": '集中隔离库',
-                               'from_source': qs.from_source})
-    queryset = yqdx_mzz.objects.filter(
-        Q(phone_no=search_value) | Q(name=search_value) | Q(sfzh=search_value)).distinct()
-    for qs in queryset:
-        back_data_list.append({"phone_no": qs.phone_no, "name": qs.name, 'sfzh': qs.sfzh, "form_ku": '发热门诊库',
-                               'from_source': qs.from_source})
-    queryset = yqdx_fyz.objects.filter(
-        Q(phone=search_value) | Q(userName=search_value) | Q(idCard=search_value)).distinct()
-    for qs in queryset:
-        back_data_list.append({"phone_no": qs.phone, "name": qs.userName, 'sfzh': qs.idCard, "form_ku": '返甬预登记库',
-                               'from_source': qs.from_source})
-    return JsonResponse({"back_data_list": back_data_list}, content_type="application/json,charset=utf-8")
-
-
-def muban_upload(request):
+def muban_upload_mzz(request):
     excel = request.FILES.get('excel')
     # 获取文件类型
-    file_type = excel.name.split('.')[-1]
+    file_type = excel.name.rsplit('.')[-1]
     file_type = file_type.lower()
     update_list = []
     err_info_list = []
@@ -159,20 +121,21 @@ def muban_upload(request):
                             err_info_list.append('手机、姓名、身份证均为空，无法入库')
                             continue
 
-                        if not yqdx.objects.filter(**kwargs).exists():  # 如果手机号不存在，则插入
+                        if not yqdx_mzz.objects.filter(**kwargs).exists():  # 如果手机号不存在，则插入
 
-                            yqdx.objects.create(phone_no=phone_no, name=name, sfzh=sfzh, hjdz=hjdz, xzdz=xzdz,
-                                                ssjd=ssjd,
-                                                is_wuhan=is_wuhan, is_hubei=is_hubei, is_not_zhenhai=is_not_zhenhai,
-                                                is_not_ningbo=is_not_ningbo,
-                                                is_not_zhejiang=is_not_zhejiang, back_provinces=back_provinces,
-                                                back_city=back_city,
-                                                back_year=back_year, back_month=back_month, back_day=back_day,
-                                                status=status, status_remarks=status_remarks, call_detail=call_detail,
-                                                self_tell=self_tell, from_source=from_source, gkr=gkr,
-                                                gkr_phone=gkr_phone,
-                                                other1=other1, other2=other2,
-                                                other3=other3)
+                            yqdx_mzz.objects.create(phone_no=phone_no, name=name, sfzh=sfzh, hjdz=hjdz, xzdz=xzdz,
+                                                    ssjd=ssjd,
+                                                    is_wuhan=is_wuhan, is_hubei=is_hubei, is_not_zhenhai=is_not_zhenhai,
+                                                    is_not_ningbo=is_not_ningbo,
+                                                    is_not_zhejiang=is_not_zhejiang, back_provinces=back_provinces,
+                                                    back_city=back_city,
+                                                    back_year=back_year, back_month=back_month, back_day=back_day,
+                                                    status=status, status_remarks=status_remarks,
+                                                    call_detail=call_detail,
+                                                    self_tell=self_tell, from_source=from_source, gkr=gkr,
+                                                    gkr_phone=gkr_phone,
+                                                    other1=other1, other2=other2,
+                                                    other3=other3)
                             insert_succ_count += 1
                         else:
                             update_list.append([phone_no, name, sfzh, ssjd, status, from_source])
@@ -189,12 +152,12 @@ def muban_upload(request):
     else:
         msg = {'code': 305, 'url': '', 'error': '不支持该类型文件'}
 
-    return render(request, 'import_result.html', {'need_update': update_list, 'msg': msg})
+    return render(request, 'import_result_mzz.html', {'need_update': update_list, 'msg': msg})
 
 
-def need_update_db(request):
+def need_update_db_mzz(request):
     upload_file_name = request.POST.get('upload_file_name')
-    update_phone_list = request.POST.getlist('update_phone')  # 手机|姓名
+    update_phone_list = request.POST.getlist('update_phone')
 
     # 开始查找静态上传文件，根据手机号更新
     # 获取程序需要写入的文件路径
@@ -217,6 +180,7 @@ def need_update_db(request):
             sfzh = str(int(sfzh))
         sfzh = sfzh.strip()
         if '{0}|{1}|{2}'.format(phone_no, name, sfzh) in update_phone_list:
+
             hjdz = sheet1.cell_value(n, 3)
             xzdz = sheet1.cell_value(n, 4)
             ssjd = sheet1.cell_value(n, 5)
@@ -270,7 +234,7 @@ def need_update_db(request):
                 else:
                     err_info_list.append('手机、姓名、身份证均为空，无法入库')
                     continue
-                query_set = yqdx.objects.filter(**kwargs)
+                query_set = yqdx_mzz.objects.filter(**kwargs)
                 null_list = ['', None, '/N', '空', '\\N', '不详']
                 if name not in null_list:
                     query_set.update(name=name)
@@ -328,92 +292,13 @@ def need_update_db(request):
                 update_error_count += 1
                 err_info_list.append('手机号:{0}，错误信息：{1}'.format(phone_no, repr(e)))
 
-    return render(request, 'update_result.html', {
+    return render(request, 'update_result_mzz.html', {
         'msg': {'code': 200, 'content': '成功覆盖更新{0}条,出错{1}条。'.format(update_succ_count, update_error_count),
                 'error': err_info_list}})
 
 
-def white_red_list_set(request):
-    return render(request, 'white_red_list_set.html')
-
-
-def white_red_list_set_db(request):
-    excel = request.FILES.get('excel')
-    list_type_value = request.POST.get('list_type')
-    bd_type = request.POST.get('bd_type')
-
-    # 获取文件类型
-    file_type = excel.name.split('.')[-1]
-    file_type = file_type.lower()
-
-    err_info_list = []
-    if file_type in ['xls', 'xlsx']:
-        # 获取当前时间的时间戳
-        timestr = str(time.time()).replace('.', '')
-        # 获取程序需要写入的文件路径
-        path = os.path.join(settings.BASE_DIR + settings.MEDIA_URL, '{0}.{1}'.format(timestr, file_type))
-        # 根据路径打开指定的文件(以二进制读写方式打开)
-        f = open(path, 'wb+')
-        # chunks将对应的文件数据转换成若干片段, 分段写入, 可以有效提高文件的写入速度, 适用于2.5M以上的文件
-        for chunk in excel.chunks():
-            f.write(chunk)
-        f.close()
-
-        # 开始导入excel模板
-        book = xlrd.open_workbook(path)
-        sheet1 = book.sheets()[0]
-        row_num = sheet1.nrows
-
-        set_succ_count = 0
-        set_error_count = 0
-
-        for n in range(0, row_num):
-            cell_0_value = sheet1.cell_value(n, 0)
-            if sheet1.cell(n, 0).ctype == 2:
-                cell_0_value = str(int(cell_0_value))
-            cell_0_value = cell_0_value.strip()
-
-            cell_1_value = sheet1.cell_value(n, 1)
-            if sheet1.cell(n, 1).ctype == 2:
-                cell_1_value = str(int(cell_1_value))
-            cell_1_value = cell_1_value.strip()
-
-            kwargs = {
-                # 动态查询的字段
-            }
-
-            if bd_type == '1' and cell_0_value != '':  # 手机号
-                kwargs['phone_no'] = cell_0_value
-            elif bd_type == '2' and cell_0_value != '':  # 身份证号
-                kwargs['sfzh'] = cell_0_value
-            elif bd_type == '3' and cell_1_value != '':  # 手机第一列，姓名第二列
-                kwargs['phone_no'] = cell_0_value
-                kwargs['name'] = cell_1_value
-            elif bd_type == '4':
-                pass
-            queryset = yqdx.objects.filter(**kwargs)
-            list_type_object = list_type.objects.get(type_value=list_type_value)
-            if kwargs and queryset.exists():  # 如果手机号姓名同时存在，则批量设置
-
-                queryset.update(white_list_flag=list_type_object)
-                set_succ_count += 1
-
-            else:
-                set_error_count += 1
-                err_info_list.append([cell_0_value, cell_1_value])
-        list_type_name = list_type.objects.values('type_name').get(type_value=list_type_value)
-
-        msg = {'code': 200,
-               'content': '成功批量设置#{0}#{1}条,出错{2}条。'.format(list_type_name['type_name'], set_succ_count,
-                                                           set_error_count),
-               'error': err_info_list}
-    else:
-        msg = {'code': 305, 'url': '', 'error': '不支持该类型文件'}
-    return render(request, 'list_set_result.html', {'msg': msg})
-
-
 @cache_page(60 * 5)
-def yqdx_list(request):
+def yqdx_list_mzz(request):
     # 搜索条件获取
     phone_no = request.POST.get('phone_no')
     name = request.POST.get('name')
@@ -426,7 +311,7 @@ def yqdx_list(request):
 
     now_page = request.GET['page']
     size = request.GET['size']
-    data_list = yqdx.objects.all().order_by('id')
+    data_list = yqdx_mzz.objects.all().order_by('id')
     if (phone_no is not None) and (phone_no != ''):
         data_list = data_list.filter(phone_no=phone_no)
         now_page = '1'
@@ -454,9 +339,8 @@ def yqdx_list(request):
     search_cache = {'phone_no': phone_no, 'name': name, 'sfzh': sfzh, 'ssjd': ssjd, 'status': status,
                     'call_detail': call_detail, 'white_list_flag': white_list_flag, 'from_source': from_source}
 
-    # data_list = yqdx.objects.filter(list_type__type_value=1)
+    # data_list = yqdx_mzz.objects.filter(list_type__type_value=1)
     if data_list.exists():
-
         # 分页
         paginator = Paginator(data_list, size)
         total_page = paginator.num_pages
@@ -472,17 +356,17 @@ def yqdx_list(request):
             pre_num = back_page.previous_page_number()
 
         # 查询数据来源值
-        from_source_list = yqdx.objects.values('from_source').distinct()
+        from_source_list = yqdx_mzz.objects.values('from_source').distinct()
         # 查询拨打情况
-        call_detail_list = yqdx.objects.values('call_detail').distinct()
+        call_detail_list = yqdx_mzz.objects.values('call_detail').distinct()
         # 查询状态
-        status_list = yqdx.objects.values('status').distinct()
+        status_list = yqdx_mzz.objects.values('status').distinct()
         # 查询所属街道
-        ssjd_list = yqdx.objects.values('ssjd').distinct()
+        ssjd_list = yqdx_mzz.objects.values('ssjd').distinct()
         # 查询白名单
         white_list_flag_list = list_type.objects.all()
 
-        return render(request, 'yqdx_list.html',
+        return render(request, 'yqdx_list_mzz.html',
                       {'back_page': back_page, 'now_page': now_page, 'size': size, 'total_page': total_page,
                        'next_num': next_num,
                        'pre_num': pre_num, 'has_pre': has_pre, 'has_next': has_next,
@@ -492,19 +376,19 @@ def yqdx_list(request):
                        'total_count': total_count})
     else:
         return HttpResponse(
-            "库里无数据，请先批量导入或修改查询条件<br><a href='/'>首页</a><br><a href='/yqdx_list?page=1&size=100'>返回列表</a>")
+            "库里无数据，请先批量导入或修改查询条件<br><a href='/'>首页</a><br><a href='/yqdx_list_mzz?page=1&size=100'>返回列表</a>")
 
 
-def jjbd(request):
-    return render(request, "jjbd.html")
+def jjbd_mzz(request):
+    return render(request, "jjbd_mzz.html")
 
 
-def jjbd_upload(request):
+def jjbd_upload_mzz(request):
     excel = request.FILES.get('excel')
     bd_type = request.POST.get('bd_type')
 
     # 获取文件类型
-    file_type = excel.name.split('.')[-1]
+    file_type = excel.name.rsplit('.')[-1]
     file_type = file_type.lower()
 
     # 获取当前时间的时间戳
@@ -554,8 +438,7 @@ def jjbd_upload(request):
             kwargs['name'] = cell_1_value
         elif bd_type == '4':
             pass
-
-        if kwargs and yqdx.objects.filter(**kwargs).exists():
+        if kwargs and yqdx_mzz.objects.filter(**kwargs).exists():
             same_sheet.write_row(same_sheet_row_num, 0, sheet1.row_values(n))
             same_sheet_row_num += 1
         else:
@@ -574,7 +457,7 @@ def jjbd_upload(request):
     return response
 
 
-def yqdx_list_export(request):
+def yqdx_list_export_mzz(request):
     phone_no = request.POST.get('phone_no')
     name = request.POST.get('name')
     sfzh = request.POST.get('sfzh')
@@ -587,7 +470,7 @@ def yqdx_list_export(request):
     # 获取当前时间的时间戳
     timestr = str(time.time()).replace('.', '')
 
-    data_list_tmp = yqdx.objects.all()
+    data_list_tmp = yqdx_mzz.objects.all()
     if (not phone_no is None) and (phone_no != ''):
         data_list_tmp = data_list_tmp.filter(phone_no=phone_no)
     if (not name is None) and (name != ''):
@@ -634,20 +517,11 @@ def yqdx_list_export(request):
     return JsonResponse(result)
 
 
-def back_date_whitelist(request):
-    safe_date = (datetime.datetime.now() + datetime.timedelta(days=-14))
-    year = safe_date.year
-    month = safe_date.month
-    day = safe_date.day
-
-    # yqdx.objects.filter(back_year)
+def bddc_mzz(request):
+    return render(request, "bddc_mzz.html")
 
 
-def bddc(request):
-    return render(request, "bddc.html")
-
-
-def bddc_upload(request):
+def bddc_upload_mzz(request):
     excel = request.FILES.get('excel')
     bd_type = request.POST.get('bd_type')
     # 获取文件类型
@@ -710,7 +584,7 @@ def bddc_upload(request):
         elif bd_type == '4':
             pass
         # 执行过滤
-        queryset_tmp = yqdx.objects.filter(**kwargs)
+        queryset_tmp = yqdx_mzz.objects.filter(**kwargs)
         if kwargs and queryset_tmp.exists():
             queryset = queryset_tmp.first()
             query_set_list = [queryset.phone_no, queryset.name, queryset.sfzh, queryset.hjdz, queryset.xzdz,
@@ -724,7 +598,6 @@ def bddc_upload(request):
 
             same_sheet.write_row(same_sheet_row_num, 0, query_set_list)
             same_sheet_row_num += 1
-
 
         else:
             different_sheet.write_row(different_sheet_row_num, 0, sheet1.row_values(n))
@@ -742,45 +615,7 @@ def bddc_upload(request):
     return response
 
 
-# 下载视图
-def download(request):
-    field = request.GET.get('field')
-    filename = request.GET.get('filename')
-    path = os.path.join(settings.BASE_DIR + settings.MEDIA_URL, field, filename)
-    file = open(path, 'rb')
-    response = FileResponse(file)
-    response['Content-Type'] = 'application/msword'
-    response['Content-Disposition'] = 'attachment;filename=' + filename
-    return response
-
-
-def yqdx_mod(request):
-    id = request.GET.get('id')
-    data_list = yqdx.objects.filter(id=id).first()
-
-    # 查询白名单名称
-    white_list_flag_list = list_type.objects.all()
-
-    if data_list:
-        msg = {'code': 200, 'error': '', 'data_list': data_list, 'white_list_flag_list': white_list_flag_list}
-    else:
-
-        msg = {'code': 305, 'error': '该对象数据库信息不存在'}
-
-    return render(request, "yqdx_mod.html", {'msg': msg})
-
-
-def yqdx_del(request):
-    id = request.GET.get('id')
-
-    if yqdx.objects.filter(id=id).delete()[0]:
-        msg = {'code': 200, 'flag': True}
-    else:
-        msg = {'code': 305, 'flag': False}
-    return JsonResponse(msg)
-
-
-def yqdx_mod_db(request):
+def yqdx_mod_db_mzz(request):
     id = request.POST.get('id')
     phone_no = request.POST.get('phone_no')
     name = request.POST.get('name')
@@ -813,22 +648,49 @@ def yqdx_mod_db(request):
     white_list_object = list_type.objects.get(type_value=white_list_flag)
 
     try:
-        yqdx.objects.filter(id=id).update(phone_no=phone_no, name=name, sfzh=sfzh, hjdz=hjdz, xzdz=xzdz,
-                                          ssjd=ssjd,
-                                          is_wuhan=is_wuhan, is_hubei=is_hubei,
-                                          is_not_zhejiang=is_not_zhejiang,
-                                          is_not_zhenhai=is_not_zhenhai, is_not_ningbo=is_not_ningbo,
-                                          back_provinces=back_provinces,
-                                          back_city=back_city, back_year=back_year, back_month=back_month,
-                                          back_day=back_day,
-                                          status=status,
-                                          status_remarks=status_remarks, call_detail=call_detail,
-                                          self_tell=self_tell,
-                                          from_source=from_source, gkr=gkr,
-                                          gkr_phone=gkr_phone, other1=other1, other2=other2, other3=other3,
-                                          white_list_flag=white_list_object)
+        yqdx_mzz.objects.filter(id=id).update(phone_no=phone_no, name=name, sfzh=sfzh, hjdz=hjdz, xzdz=xzdz,
+                                              ssjd=ssjd,
+                                              is_wuhan=is_wuhan, is_hubei=is_hubei,
+                                              is_not_zhejiang=is_not_zhejiang,
+                                              is_not_zhenhai=is_not_zhenhai, is_not_ningbo=is_not_ningbo,
+                                              back_provinces=back_provinces,
+                                              back_city=back_city, back_year=back_year, back_month=back_month,
+                                              back_day=back_day,
+                                              status=status,
+                                              status_remarks=status_remarks, call_detail=call_detail,
+                                              self_tell=self_tell,
+                                              from_source=from_source, gkr=gkr,
+                                              gkr_phone=gkr_phone, other1=other1, other2=other2, other3=other3,
+                                              white_list_flag=white_list_object)
         msg = {'code': 200, 'info': '修改成功!', 'error': ''}
     except Exception as e:
         msg = {'code': 305, 'info': '修改失败!', 'error': phone_no + ':' + repr(e)}
 
-    return render(request, "mod_result.html", {'msg': msg})
+    return render(request, "mod_result_mzz.html", {'msg': msg})
+
+
+def yqdx_mod_mzz(request):
+    id = request.GET.get('id')
+    data_list = yqdx_mzz.objects.filter(id=id).first()
+
+    # 查询白名单名称
+    white_list_flag_list = list_type.objects.all()
+
+    if data_list:
+        msg = {'code': 200, 'error': '', 'data_list': data_list, 'white_list_flag_list': white_list_flag_list}
+    else:
+
+        msg = {'code': 305, 'error': '该对象数据库信息不存在'}
+
+    return render(request, "yqdx_mod_mzz.html", {'msg': msg})
+
+
+def yqdx_del_mzz(request):
+    id = request.GET.get('id')
+
+    if yqdx_mzz.objects.filter(id=id).delete()[0]:
+        msg = {'code': 200, 'flag': True}
+    else:
+        msg = {'code': 305, 'flag': False}
+    return JsonResponse(msg)
+

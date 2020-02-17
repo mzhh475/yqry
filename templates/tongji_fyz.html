@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>返甬预登记人员统计</title>
+    <script type='text/javascript' src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <script type='text/javascript' src="{% static 'js/echarts.min.js' %}"></script>
+</head>
+<body>
+<table width="100%" border="1" style="table-layout:fixed;">
+    <tr><td>
+        <div id="tongji_provinces" style="width: 100%;height:500px;"></div>
+    </td><td>
+        <div id="zengzhanglv_provinces" style="width:100%;height:500px;"></div>
+    </td></tr>
+    <tr><td>
+        <div id="tongji_city" style="width: 100%;height:500px;"></div>
+    </td><td>
+        <div id="zengzhanglv_city" style="width: 100%;height:500px;"></div>
+    </td></tr>
+</table>
+
+<script type="text/javascript">
+    <!--  省返甬人数统计 -->
+    var tongji_provinces_Chart = echarts.init(document.getElementById('tongji_provinces'));
+
+        // 指定图表的配置项和数据
+        var option = {
+    title: {
+        left: 'left',
+        text: '疫情区返甬趋势图（省） ',
+        subtext: '徐振华工作室统计'
+    },
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+        }
+    },
+    legend: {
+        data: [{{back_provinces|safe}},'{{quanguo_tongji_dic.quanguo}}']
+    },
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+    },
+    xAxis: {
+        type: 'value'
+    },
+    yAxis: {
+        type: 'category',
+        data: [{{back_date|safe}}]
+    },
+    series: [
+        {% for provinces_tongji in provinces_tongji_list %}
+    {
+            name: '{{provinces_tongji.provinces}}',
+            type: 'bar',
+            stack: '省总量',
+            label: {
+                show: true,
+
+                position: 'insideRight'
+            },
+            data: [{{provinces_tongji.tongji}}]
+        },
+    {% endfor %}
+    {
+            name: '{{quanguo_tongji_dic.quanguo}}',
+            type: 'bar',
+            stack: '全国总量',
+            label: {
+                show: true,
+                formatter: '{a} {c}',
+                position: 'insideRight'
+            },
+            data: [{{quanguo_tongji_dic.tongji}}]
+        }
+    ]
+};
+        // 使用刚指定的配置项和数据显示图表。
+        tongji_provinces_Chart.setOption(option);
+
+
+<!--     配置省增长率-->
+        var zengzhanglv_provinces_Chart = echarts.init(document.getElementById('zengzhanglv_provinces'));
+    option = {
+    title: {
+        text: '疫情区返甬每日增长率（省）',
+        subtext: '徐振华工作室统计'
+    },
+
+    legend: {
+        data: [{{back_provinces|safe}}]
+    },
+
+    xAxis: {
+        type: 'category',
+        data: [{{back_date|safe}}]
+    },
+    yAxis: {
+        type: 'value',
+        axisLabel: {
+            formatter: '{value}%'
+        }
+    },
+    series: [
+    {% for provinces_zengzhanglv in provinces_zengzhanglv_list %}
+        {
+            name: '{{provinces_zengzhanglv.provinces}}',
+            type: 'line',
+            label:{
+              show: true,
+              formatter: '{c}%',
+            },
+            data: [{{provinces_zengzhanglv.zengzhanglv}}],
+
+        },
+     {% endfor %}
+    ]
+};
+        zengzhanglv_provinces_Chart.setOption(option);
+
+
+<!--        统计市返甬人数-->
+        var tongji_city_Chart = echarts.init(document.getElementById('tongji_city'));
+
+        // 指定图表的配置项和数据
+        var option = {
+    title: {
+        left: 'left',
+        text: '疫情区返甬趋势图（市）',
+        subtext: '徐振华工作室统计'
+    },
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+        }
+    },
+    legend: {
+        data: [{{back_city|safe}}]
+    },
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+    },
+    xAxis: {
+        type: 'value'
+    },
+    yAxis: {
+        type: 'category',
+        data: [{{back_date|safe}}]
+    },
+    series: [
+    {% for city_tongji in city_tongji_list %}
+    {
+            name: '{{city_tongji.city}}',
+            type: 'bar',
+            stack: '总量',
+            label: {
+                show: true,
+                position: 'insideRight'
+            },
+            data: [{{city_tongji.tongji}}]
+        },
+    {% endfor %}
+    ]
+};
+        // 使用刚指定的配置项和数据显示图表。
+        tongji_city_Chart.setOption(option);
+
+<!--      统计市增长率-->
+        var zengzhanglv_city_Chart = echarts.init(document.getElementById('zengzhanglv_city'));
+    option = {
+    title: {
+        text: '疫情区返甬每日增长率（市）',
+        subtext: '徐振华工作室统计'
+    },
+
+    legend: {
+        data: [{{back_city|safe}}]
+    },
+
+    xAxis: {
+        type: 'category',
+        data: [{{back_date|safe}}]
+    },
+    yAxis: {
+        type: 'value',
+        axisLabel: {
+            formatter: '{value}%'
+        }
+    },
+    series: [
+    {% for city_zengzhanglv in city_zengzhanglv_list %}
+        {
+            name: '{{city_zengzhanglv.city}}',
+            type: 'line',
+            label:{
+              show: true,
+              formatter: '{c}%',
+            },
+            data: [{{city_zengzhanglv.zengzhanglv}}],
+
+        },
+     {% endfor %}
+    ]
+};
+
+
+        zengzhanglv_city_Chart.setOption(option);
+
+
+    </script>
+
+</body>
+</html>

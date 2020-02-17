@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>(返甬人员预登记)数据同步</title>
+    <script type='text/javascript' src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <script>
+        $(function(){
+            $("#submit").click(function(){
+             if($("#session").val()==''){
+             alert('输入不能为空');
+             }else if($("#session").val().length!=32){
+             alert('cookie长度应该为32位');
+             }
+
+             else{
+                $("#status_div").html('同步中.....请耐心等候!')
+                $.post("/tongbu",$("form").serialize(),function(data){
+                    if(data['code']==305){
+                        alert(data['msg']);
+                    }else if(data['code']==200){
+                        alert(data['msg']);
+                        $.each(data['error'],function(i,v){
+                            $("#error_div").append(v+'<br>');
+
+                        });
+
+                    }
+                $("#status_div").html(data['msg'])
+                },"json");
+
+
+             }
+            });
+        });
+
+
+    </script>
+</head>
+<body>
+<form action="" method="post">
+{% csrf_token %}
+
+    <div>(返甬人员预登记)自动同步</div>
+
+    <div>请输入数字证书登录后的cookie值：（获取方法：chrome->F12->Application->Cookies->Value 复制）<p> <input type="text" name="session_id" id="session" size="50" maxlength="32">
+        <input type="button" value="开始同步" id="submit"></p></div>
+</form>
+<br>
+<div id="status_div"></div><br>
+<div id="error_div"></div>
+<a href="/">首页</a>
+</body>
+</html>
