@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>红黄绿码组疫情对象详表</title>
+    <script type='text/javascript' src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <style>
+body,table{
+    font-size:12px;
+}
+table.list_table{
+    border:1px solid #cad9ea;
+    color:#666;
+    empty-cells:show;
+    border-collapse: collapse;
+    margin:0 auto;
+    table-layout:fixed;
+}
+table.list_table th {
+
+	background-repeat::repeat-x;
+	height:30px;
+	color:black;
+}
+table.list_table td{
+	border:1px dashed #cad9ea;
+	word-wrap:break-word;
+	word-break:break-all;
+}
+
+
+    </style>
+    <script>
+$.ajaxSetup({
+            data:{csrfmiddlewaretoken:'{{ csrf_token }}'}
+        })
+        $(function(){
+
+            //重置按钮
+            $("#reset").click(function(){
+                $(".search_input").val("");
+                $("select[name='ma_status'] option[value='全部']").prop("selected", true);
+                $("select[name='zlm'] option[value='全部']").prop("selected", true);
+                $("select[name='zhm'] option[value='全部']").prop("selected", true);
+                $("select[name='from_source'] option[value='全部']").prop("selected", true);
+            });
+
+            //设置返回搜索缓存
+            $("select[name='ma_status'] option[value='{{search_cache.ma_status}}']").prop("selected", true);
+            $("select[name='zlm'] option[value='{{search_cache.zlm}}']").prop("selected", true);
+            $("select[name='zhm'] option[value='{{search_cache.zhm}}']").prop("selected", true);
+            $("select[name='from_source'] option[value='{{search_cache.from_source}}']").prop("selected", true);
+            //监听导出按钮
+            $("#output").click(function(){
+                $(this).attr("value","导出中")
+                $.post("/yqdx_list_export_hhz", $("#search_form").serialize(),function(data){
+
+                    window.location.href="/download?field="+data['field']+"&filename="+data['filename'];
+                    $("#output").attr("value","导出")
+                },'json');
+            });
+            //疫情对象修改
+            $(".yqdx_mod").click(function(){
+            var id=$(this).attr("id");
+            window.location.href="{%url 'yqdx_mod_hhz' %}?id="+id;
+            });
+            //对象删除
+            $(".yqdx_del").click(function(){
+                var id=$(this).attr("id");
+                if (confirm("确定从库里删除该对象？")){
+                $.get("/yqdx_del_hhz?id="+id,function(data){
+                    if(data["flag"]){
+                    alert("删除成功");
+                    window.location.href="?page=1&size=100"
+                    }else{
+                    alert("删除失败");
+                    }
+                },"json");
+                }
+            });
+
+        });
+
+    </script>
+
+</head>
+<body>
+<div align="center"><a href="/">首页</a>&nbsp;&nbsp;
+    <a href="/dx_import_hhz" target="_blank">批量导入</a>&nbsp;&nbsp;
+    <a href="/jjbd_hhz" target="_blank">交集比对</a>&nbsp;&nbsp;
+    <a href="/bddc_hhz" target="_blank">比对导出</a>&nbsp;&nbsp;</div>
+<form method="post" action="/yqdx_list_hhz?page={{now_page}}&size={{size}}" id="search_form">
+    {% csrf_token %}
+<table class="search_table">
+    <tr><th>检索条件</th></tr>
+    <tr><td>手机号</td><td><input name="phone_no" class="search_input" value="{% ifnotequal search_cache.phone_no None %}{{search_cache.phone_no}}{% endifnotequal %}"></td>
+        <td>姓名</td><td><input name="name" class="search_input" placeholder="支持模糊查询" value="{% ifnotequal search_cache.name None %}{{search_cache.name}}{% endifnotequal %}"></td>
+        <td>身份证号</td><td><input name="sfzh" class="search_input" placeholder="支持模糊查询" value="{% ifnotequal search_cache.sfzh None %}{{search_cache.sfzh}}{% endifnotequal %}"></td>
+        <td>原码状态</td><td>
+        <select name="ma_status">
+            <option value="全部">全部</option>
+            {% for ma_status_list_tmp in ma_status_list %}
+            <option value="{{ ma_status_list_tmp.ma_status }}">{{ ma_status_list_tmp.ma_status }}</option>
+            {% endfor %}
+        </select>
+    </td></tr>
+    <tr><td>转绿码</td><td>
+        <select name="zlm">
+            <option value="全部">全部</option>
+            {% for zlm_list_tmp in zlm_list %}
+            <option value="{{ zlm_list_tmp.zlm }}">{{ zlm_list_tmp.zlm }}</option>
+            {% endfor %}
+        </select>
+    </td><td>转黄/红码</td><td>
+        <select name="zhm">
+            <option value="全部">全部</option>
+            {% for zhm_list_tmp in zhm_list %}
+            <option value="{{ zhm_list_tmp.zhm }}">{{ zhm_list_tmp.zhm }}</option>
+            {% endfor %}
+        </select>
+    </td><td>数据来源</td><td>
+        <select name="from_source">
+            <option value="全部">全部</option>
+            {% for from_source_list_tmp in from_source_list %}
+            <option value="{{ from_source_list_tmp.from_source }}">{{ from_source_list_tmp.from_source }}</option>
+            {% endfor %}
+        </select>
+    </td><td></td><td></td>
+    </tr>
+<tr><td colspan="4"><input type="submit" value="检索">&nbsp;<td colspan="4"><input type="button" value="重置" id="reset">&nbsp;<td colspan="4"><input type="button" value="导出" id="output"></td></tr>
+</table >
+</form>
+<table width="100%" border="1" class="list_table">
+    <tr><th colspan="27" align="center"><h3 style="color:red;">镇海公安分局疫情人员（红黄绿码组）对象情况表</h3></th></tr>
+    <tr><td colspan="27" align="right">{{now_page}}/{{total_page}}&nbsp;<a href="/yqdx_list_hhz?page=1&size=100">首页</a>&nbsp;
+        {% if has_pre %}
+        <a href="/yqdx_list_hhz?page={{ pre_num }}&size=100">上一页</a>&nbsp;
+        {% endif %}
+        {% if has_next %}
+        <a href="/yqdx_list_hhz?page={{ next_num }}&size=100">下一页</a>&nbsp;
+        {% endif %}
+        <a href="/yqdx_list_hhz?page={{ total_page }}&size=100">末页</a>&nbsp;总{{total_count}}条</td></tr>
+    <tr><th>序号</th><th>手机号</th><th>姓名</th><th>身份证号</th><th>居住地</th><th>来自区域</th><th>健康状态</th><th>14天离开过</th>
+        <th>是否本地</th><th>隔离状态</th><th>研判依据</th><th>原码状态</th><th>采集时间</th><th>确诊</th><th>疑似</th><th>集中隔离</th>
+        <th>居家隔离</th><th>未发现</th><th>不在甬</th><th>申诉中</th><th>转绿码</th><th>转黄/红码</th><th>工作中</th><th>备注</th><th>入库时间</th><th>数据来源</th><th>操作</th></tr>
+
+    {% for tmp in back_page %}
+    <tr><td>{{ forloop.counter }}<td>{{ tmp.phone_no }}</td><td>{{ tmp.name }}</td><td>{{ tmp.sfzh }}</td>
+        <td>{{ tmp.xzdz }}</td><td>{{ tmp.lzqy }}</td><td>{{ tmp.jkzt }}</td><td>{{ tmp.get_is_14_display }}</td>
+        <td>{{ tmp.get_is_local_display }}</td><td>{{ tmp.get_glzt_display }}</td><td>{{ tmp.ypyj }}</td>
+        <td>{{ tmp.ma_status }}</td><td>{{ tmp.cjsj|date:"Y-m-d H:i" }}</td><td>{{ tmp.qz }}</td><td>{{ tmp.ys }}</td><td>{{ tmp.jzgl }}</td>
+        <td>{{ tmp.jjgl }}</td><td>{{ tmp.wfx }}</td><td>{{ tmp.bzy }}</td><td>{{ tmp.ssz }}</td><td>{{ tmp.zlm }}</td><td>{{ tmp.zhm }}</td><td>{{ tmp.gzz }}</td><td>{{ tmp.remark }}</td><td>{{ tmp.timestamp|date:"Y-m-d H:i" }}</td><td>{{ tmp.from_source }}</td>
+        <td><input type="button" value="改" class="yqdx_mod" id="{{ tmp.id }}">&nbsp;<input type="button" value="删" class="yqdx_del" id="{{ tmp.id }}"></td></tr>
+
+    {% endfor %}
+
+    <tr><td colspan="27" align="right">{{now_page}}/{{total_page}}&nbsp;<a href="/yqdx_list_hhz?page=1&size=100">首页</a>&nbsp;
+        {% if has_pre %}
+        <a href="/yqdx_list_hhz?page={{ pre_num }}&size=100">上一页</a>&nbsp;
+        {% endif %}
+        {% if has_next %}
+        <a href="/yqdx_list_hhz?page={{ next_num }}&size=100">下一页</a>&nbsp;
+        {% endif %}
+        <a href="/yqdx_list_hhz?page={{ total_page }}&size=100">末页</a>&nbsp;总{{total_count}}条</td></tr>
+</table>
+<div id="output_div"></div>
+</body>
+</html>

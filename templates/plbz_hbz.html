@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>湖北籍在甬去库存对象-批量标注</title>
+</head>
+<body>
+
+<form action="/plbz_hbz_db" method="post" enctype="multipart/form-data" >
+{% csrf_token %}
+    <table>
+        <tr><th colspan="2">湖北籍在甬去库存对象-批量标注</th></tr>
+    <tr><td colspan="2">
+        标注方式：<select name="bz_type">
+    <option value="1">手机号第一列</option>
+    <option value="2">身份证号第一列</option>
+    <option value="3">手机第一列，姓名第二列</option>
+    <option value="4">备用</option>
+</select>
+    </td></tr>
+        <tr><td>类型</td><td>
+            <select name="label_type">
+                <option value="0">未处理</option>
+                <option value="1">已研判排除</option>
+                <option value="2">已返甬在管</option>
+                <option value="3">已返甬未管</option>
+                <option value="4">不返甬</option>
+                <option value="5">其他</option>
+            </select>
+        </td></tr>
+
+        <tr><td>文件：</td><td><input type="file" name="excel" id="excel" ></td></tr>
+
+        <tr><td colspan="2"><input type="submit" value="提交"></td></tr>
+    </table>
+
+
+</form>
+<br><a href='/'>首页</a>
+
+</body>
+</html>

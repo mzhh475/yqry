@@ -246,3 +246,62 @@ class yqdx_zzq_city(models.Model):
         db_table = 'yqdx_zzq_city'
         verbose_name = '疫情对象重灾区市'
         verbose_name_plural = verbose_name  # 去复数形式
+
+
+class yqdx_hhz(models.Model):
+    # 疫情人员表
+    phone_no = models.CharField('手机号', max_length=11, null='空')  # 手机号
+    name = models.CharField('姓名', max_length=20, null=True)  # 姓名
+    card_type = models.SmallIntegerField('证件类型', default=0)
+    sfzh = models.CharField('身份证号', max_length=18, null=True, unique=True)  # 身份证
+    xzdz = models.CharField('现住地址', max_length=500, null=True)
+    lzqy = models.CharField('来自区域', max_length=20, default='空')
+    jkzt = models.SmallIntegerField('健康状态', default=1)
+    is_14 = models.SmallIntegerField('14天是否离开', default=0, choices=((1, '是'), (0, '否'),))
+    is_local = models.SmallIntegerField('是否本地', default=1, choices=((0, '是'), (1, '否'),))
+    glzt = models.SmallIntegerField('隔离状态', default=1,
+                                    choices=((0, '未隔离'), (1, '居家'), (2, '集中'), (3, '解除'),))
+    ypyj = models.CharField('研判依据', max_length=100, default='')
+    sjly = models.CharField('数据来源', max_length=100, default='')
+    ma_status = models.CharField('码状态', max_length=10, default='绿码')
+    cjsj = models.DateTimeField('采集时间', null=True)
+    gxdw = models.CharField('管辖单位', max_length=50, default='')
+    qz = models.CharField('确诊', max_length=500, default='')
+    ys = models.CharField('疑似', max_length=500, default='')
+    jzgl = models.CharField('集中隔离', max_length=500, default='')
+    jjgl = models.CharField('居家隔离', max_length=500, default='')
+    wfx = models.CharField('未发现', max_length=500, default='')
+    bzy = models.CharField('不在甬', max_length=500, default='')
+    ssz = models.CharField('申诉中', max_length=500, default='')
+    zlm = models.CharField('转绿码', max_length=500, default='')
+    zhm = models.CharField('转黄码', max_length=500, default='')
+    gzz = models.CharField('工作中', max_length=500, default='')
+    timestamp = models.DateTimeField('最后更新时间', auto_now=True)
+    from_source = models.CharField('导入数据来源', max_length=50, default='')
+    remark = models.CharField('备注', max_length=500, default='')
+
+    class Meta:
+        # 元类
+        db_table = 'yqdx_hhz'
+        verbose_name = '疫情对象红黄绿码组'
+        verbose_name_plural = verbose_name  # 去复数形式
+
+
+class yqdx_hbz(models.Model):
+    # 疫情人员表
+    name = models.CharField('姓名', max_length=20, null=True)  # 姓名
+    sfzh = models.CharField('身份证号', max_length=18, null=True)  # 身份证
+    phone_no = models.CharField('手机号', max_length=11, null='空')  # 手机号
+    hjdz = models.CharField('户籍地址', max_length=500, null=True)
+    xzdz = models.CharField('现住地址', max_length=500, null=True)
+    remark = models.CharField('备注', max_length=500, null=True)
+    label = models.SmallIntegerField('标签', default=0, choices=(
+                                     (0, '未处理'), (1, '已研判排除'), (2, '已返甬未管'), (3, '已返甬在管'), (4, '不返甬'), (5, '其他'),))
+    timestamp = models.DateTimeField('入库时间', auto_now=True)
+    from_source = models.CharField('数据来源', max_length=50, default='区隔离数据')
+
+    class Meta:
+        # 元类
+        db_table = 'yqdx_hbz'
+        verbose_name = '疫情对象湖北籍去库存库'
+        verbose_name_plural = verbose_name  # 去复数形式

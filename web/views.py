@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.db.utils import DataError
 from django.core.paginator import Paginator
 from yqry import settings
-from .models import yqdx, list_type, yqdx_hwz, yqdx_ypz, yqdx_glz, yqdx_mzz, yqdx_fyz
+from .models import yqdx, list_type, yqdx_hwz, yqdx_ypz, yqdx_glz, yqdx_mzz, yqdx_fyz, yqdx_hhz, yqdx_hbz
 import xlsxwriter
 from django.http import FileResponse
 from django.utils.http import urlquote
@@ -18,6 +18,8 @@ from django.views.decorators.cache import cache_page
 # Create your views here.
 
 def index(request):
+    request.session['progress_message'] = ''
+    request.session.set_expiry(0)  # 浏览器关闭后，session失效
     return render(request, 'index.html', )
 
 
@@ -58,6 +60,17 @@ def search_all(request):
     for qs in queryset:
         back_data_list.append({"phone_no": qs.phone, "name": qs.userName, 'sfzh': qs.idCard, "form_ku": '返甬预登记库',
                                'from_source': qs.from_source})
+    queryset = yqdx_hhz.objects.filter(
+        Q(phone_no=search_value) | Q(name=search_value) | Q(sfzh=search_value)).distinct()
+    for qs in queryset:
+        back_data_list.append({"phone_no": qs.phone_no, "name": qs.name, 'sfzh': qs.sfzh, "form_ku": '红黄码纠错库',
+                               'from_source': qs.from_source})
+    queryset = yqdx_hbz.objects.filter(
+        Q(phone_no=search_value) | Q(name=search_value) | Q(sfzh=search_value)).distinct()
+    for qs in queryset:
+        back_data_list.append({"phone_no": qs.phone_no, "name": qs.name, 'sfzh': qs.sfzh, "form_ku": '湖北籍在甬去库存库',
+                               'from_source': qs.from_source})
+
     return JsonResponse({"back_data_list": back_data_list}, content_type="application/json,charset=utf-8")
 
 
@@ -258,6 +271,7 @@ def need_update_db(request):
             other3 = sheet1.cell_value(n, 24)
             try:
                 kwargs = {}  # 动态查询的字段
+                kwargs2 = {}  # 动态更新的字段
                 if phone_no:  # 手机号非空
                     kwargs['phone_no'] = phone_no
                     kwargs['name'] = name
@@ -273,56 +287,56 @@ def need_update_db(request):
                 query_set = yqdx.objects.filter(**kwargs)
                 null_list = ['', None, '/N', '空', '\\N', '不详']
                 if name not in null_list:
-                    query_set.update(name=name)
+                    kwargs2['name']=name
                 if sfzh not in null_list:
-                    query_set.update(sfzh=sfzh)
+                    kwargs2['sfzh']=sfzh
                 if hjdz not in null_list:
-                    query_set.update(hjdz=hjdz)
+                    kwargs2['hjdz']=hjdz
                 if xzdz not in null_list:
-                    query_set.update(xzdz=xzdz)
+                    kwargs2['xzdz']=xzdz
                 if ssjd not in null_list:
-                    query_set.update(ssjd=ssjd)
+                    kwargs2['ssjd']=ssjd
                 if is_wuhan not in null_list:
-                    query_set.update(is_wuhan=is_wuhan)
+                    kwargs2['is_wuhan']=is_wuhan
                 if is_hubei not in null_list:
-                    query_set.update(is_hubei=is_hubei)
+                    kwargs2['is_hubei']=is_hubei
                 if is_not_zhenhai not in null_list:
-                    query_set.update(is_not_zhenhai=is_not_zhenhai)
+                    kwargs2['is_not_zhenhai']=is_not_zhenhai
                 if is_not_ningbo not in null_list:
-                    query_set.update(is_not_ningbo=is_not_ningbo)
+                    kwargs2['is_not_ningbo']=is_not_ningbo
                 if is_not_zhejiang not in null_list:
-                    query_set.update(is_not_zhejiang=is_not_zhejiang)
+                    kwargs2['is_not_zhejiang']=is_not_zhejiang
                 if back_provinces not in null_list:
-                    query_set.update(back_provinces=back_provinces)
+                    kwargs2['back_provinces']=back_provinces
                 if back_city not in null_list:
-                    query_set.update(back_city=back_city)
+                    kwargs2['back_city']=back_city
                 if back_year not in null_list:
-                    query_set.update(back_year=back_year)
+                    kwargs2['back_year']=back_year
                 if back_month not in null_list:
-                    query_set.update(back_month=back_month)
+                    kwargs2['back_month']=back_month
                 if back_day not in null_list:
-                    query_set.update(back_day=back_day)
+                    kwargs2['back_day']=back_day
                 if status not in null_list:
-                    query_set.update(status=status)
+                    kwargs2['status']=status
                 if status_remarks not in null_list:
-                    query_set.update(status_remarks=status_remarks)
+                    kwargs2['status_remarks']=status_remarks
                 if call_detail not in null_list:
-                    query_set.update(call_detail=call_detail)
+                    kwargs2['call_detail']=call_detail
                 if self_tell not in null_list:
-                    query_set.update(self_tell=self_tell)
+                    kwargs2['self_tell']=self_tell
                 if from_source not in null_list:
-                    query_set.update(from_source=from_source)
+                    kwargs2['from_source']=from_source
                 if gkr not in null_list:
-                    query_set.update(gkr=gkr)
+                    kwargs2['gkr']=gkr
                 if gkr_phone not in null_list:
-                    query_set.update(gkr_phone=gkr_phone)
+                    kwargs2['gkr_phone']=gkr_phone
                 if other1 not in null_list:
-                    query_set.update(other1=other1)
+                    kwargs2['other1']=other1
                 if other2 not in null_list:
-                    query_set.update(other2=other2)
+                    kwargs2['other2']=other2
                 if other3 not in null_list:
-                    query_set.update(other3=other3)
-
+                    kwargs2['other3'] =other3
+                query_set.update(**kwargs2)
                 update_succ_count += 1
             except DataError as e:
                 update_error_count += 1

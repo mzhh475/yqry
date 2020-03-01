@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>（在甬湖北籍去库存数据）碰撞比对</title>
+</head>
+<body>
+<form action="/jjbd_upload_hbz" method="post" enctype="multipart/form-data" >
+{% csrf_token %}
+    <div>（在甬湖北籍去库存数据）交集比对（请将手机号放在第一列，姓名第二列）</div>
+    <div>
+    <input type="file" name="excel" id="excel" >
+    比对方式：<select name="bd_type">
+        <option value="1">手机号第一列</option>
+        <option value="2">身份证号第一列</option>
+        <option value="3">手机第一列，姓名第二列</option>
+        <option value="4">备用</option>
+    </select><br><br>
+        <p>
+            <label><input name="labels" type="checkbox" value="0" checked>未处理</label>&nbsp;
+            <label><input name="labels" type="checkbox" value="1" checked>已研判排除</label>&nbsp;
+            <label><input name="labels" type="checkbox" value="2" checked>已返甬未管</label>&nbsp;
+            <label><input name="labels" type="checkbox" value="3" checked>已返甬在管</label>&nbsp;
+            <label><input name="labels" type="checkbox" value="4" checked>不返甬</label>&nbsp;
+            <label><input name="labels" type="checkbox" value="5" checked>其他</label>&nbsp;
+
+        </p>
+    <input type="submit" value="比对"></div>
+</form>
+
+<br><a href='/'>首页</a>
+</body>
+</html>

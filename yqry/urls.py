@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from web import views, views_mzz, views_ypz, views_glz, views_hwz, views_fyz
+from web import views, views_mzz, views_ypz, views_glz, views_hwz, views_fyz, views_hhz, views_hbz
 from django.contrib import admin
 
 urlpatterns = [
@@ -109,9 +109,40 @@ urlpatterns = [
     url('^zzq_fyz_db$', views_fyz.zzq_fyz_db),
     url('^tongji_fyz$', views_fyz.tongji_fyz),
 
+    url('^get_progress_message$', views_fyz.get_progress_message, name='get_progress_message'),
 
 
+#红黄绿码组url
+    url('^dx_import_hhz$', views_hhz.dx_import_hhz),
+    url('^muban_upload_hhz$', views_hhz.muban_upload_hhz),
+    url('^need_update_db_hhz$', views_hhz.need_update_db_hhz),
+    url('^yqdx_list_hhz$', views_hhz.yqdx_list_hhz),
+    url('^jjbd_hhz$', views_hhz.jjbd_hhz),
+    url('^jjbd_upload_hhz$', views_hhz.jjbd_upload_hhz),
+    url('^bddc_hhz$', views_hhz.bddc_hhz),
+    url('^bddc_upload_hhz$', views_hhz.bddc_upload_hhz),
+    url('^yqdx_list_export_hhz$', views_hhz.yqdx_list_export_hhz),
+    url(r'^yqdx_mod_hhz$', views_hhz.yqdx_mod_hhz, name='yqdx_mod_hhz'),
+    url(r'^yqdx_del_hhz$', views_hhz.yqdx_del_hhz, name='yqdx_del_hhz'),
+    url(r'^yqdx_mod_db_hhz$', views_hhz.yqdx_mod_db_hhz, name='yqdx_mod_db_hhz'),
 
+# 武汉籍在甬去库存数据组url
+    url('^dx_import_hbz$', views_hbz.dx_import_hbz),
+    url('^muban_upload_hbz$', views_hbz.muban_upload_hbz),
+    url('^need_update_db_hbz$', views_hbz.need_update_db_hbz),
+    url('^yqdx_list_hbz$', views_hbz.yqdx_list_hbz, name='yqdx_list_hbz'),
+    url('^jjbd_hbz$', views_hbz.jjbd_hbz),
+    url('^jjbd_upload_hbz$', views_hbz.jjbd_upload_hbz),
+    url('^bddc_hbz$', views_hbz.bddc_hbz),
+    url('^bddc_upload_hbz$', views_hbz.bddc_upload_hbz),
+    url('^yqdx_list_export_hbz$', views_hbz.yqdx_list_export_hbz),
+    url(r'^yqdx_mod_hbz$', views_hbz.yqdx_mod_hbz, name='yqdx_mod_hbz'),
+    url(r'^yqdx_del_hbz$', views_hbz.yqdx_del_hbz, name='yqdx_del_hbz'),
+    url(r'^yqdx_mod_db_hbz$', views_hbz.yqdx_mod_db_hbz, name='yqdx_mod_db_hbz'),
+
+    url(r'^muban_upload_hbz$', views_hbz.muban_upload_hbz, name='muban_upload_hbz'),
+    url(r'^plbz_hbz$', views_hbz.plbz_hbz, name='plbz_hbz'),
+    url(r'^plbz_hbz_db$', views_hbz.plbz_hbz_db, name='plbz_hbz_db'),
 
 
 ]

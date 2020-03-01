@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = 'u(&bolsxyh-#dii79kixqylocui)1mwv*y#du$zbuh^qgg-#h$'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -70,8 +68,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'yqry.wsgi.application'
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  #默认设置为5M
-DATA_UPLOAD_MAX_NUMBER_FIELDS = 102400 # higher than the count of fields
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 默认设置为5M
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 102400  # higher than the count of fields
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -85,7 +83,6 @@ DATABASES = {
         'PORT': '3306'  # mysql数据库端口，一般为3306，如果不是请修改
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -105,7 +102,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
@@ -117,8 +113,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = False
-
+USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
@@ -145,3 +140,13 @@ CACHES = {
         }
     }
 }
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # 引擎（默认）
+SESSION_COOKIE_NAME = "sessionid"  # Session的cookie保存在浏览器上时的key，即：sessionid＝随机字符串（默认）
+SESSION_COOKIE_PATH = "/"  # Session的cookie保存的路径（默认）
+SESSION_COOKIE_DOMAIN = None  # Session的cookie保存的域名（默认）
+SESSION_COOKIE_SECURE = False  # 是否Https传输cookie（默认）
+SESSION_COOKIE_HTTPONLY = True  # 是否Session的cookie只支持http传输（默认）
+SESSION_COOKIE_AGE = 600  # Session的cookie失效日期（2周）（默认）
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 是否关闭浏览器使得Session过期（默认）
+SESSION_SAVE_EVERY_REQUEST = True  # 是否每次请求都保存Session，默认修改之后才保存（默认）

@@ -3,6 +3,7 @@ import time, datetime
 import xlrd
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
+from django.utils.http import urlquote
 from django.views.decorators.csrf import csrf_protect
 from django.core.paginator import Paginator
 from yqry import settings
@@ -16,23 +17,36 @@ from django.db.models import Count
 # Create your views here.
 
 ###################返甬人员组######################################
+
+def get_progress_message(request):
+
+    dt = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+    if not request.session.get('progress_message'):
+        return HttpResponse(dt + ':session初始化')
+    else:
+        return HttpResponse(dt + ':' + request.session.get('progress_message'))
+
+
 def dx_import_fyz(request):
     return render(request, "import_fyz.html")
 
 
 def tongbu(request):
     session_id = request.POST.get('session_id')
+    request.session['progress_message'] = '读取中...'
+    request.session.save()
+    request.session.set_expiry(0)          #浏览器关闭后，session失效
     succ_count = 0
     error_list = []
     i = 1
-    back_dic = import_data_test(session_id, i)
+    back_dic = import_data(session_id, i)
     if back_dic['code'] == 305:
         return JsonResponse({"code": 305, "msg": "cookie值无效，请重新输入！", "error": "cookie值无效，请重新输入！"})
     elif back_dic['code'] == 200 and back_dic['count'] > 0:
+        try:
+            while True:
+                insert_dic_list = list()
 
-        while True:
-            insert_dic_list=list()
-            try:
                 for dic in back_dic['dic_list']:
 
                     uuid = dic['uuid']
@@ -52,24 +66,30 @@ def tongbu(request):
 
                     if not yqdx_fyz.objects.filter(uuid=uuid).exists():
                         insert_dic_list.append(yqdx_fyz(uuid=uuid, userName=userName, phone=phone, idCard=idCard,
-                                                liveAddress=liveAddress, workAddress=workAddress, carNo=carNo,
-                                                carType=carType, startAddress_provinces=startAddress_provinces,
-                                                startAddress_city=startAddress_city,
-                                                startAddress_county=startAddress_county,
-                                                endAddress_city=endAddress_city,
-                                                endAddress_county=endAddress_county, endAddress_town=endAddress_town,
-                                                endArea=endArea, kakou=kakou, whyGo=whyGo, createTime=createTime,
-                                                createDate=createTime.split(' ')[0]))
+                                                        liveAddress=liveAddress, workAddress=workAddress, carNo=carNo,
+                                                        carType=carType, startAddress_provinces=startAddress_provinces,
+                                                        startAddress_city=startAddress_city,
+                                                        startAddress_county=startAddress_county,
+                                                        endAddress_city=endAddress_city,
+                                                        endAddress_county=endAddress_county,
+                                                        endAddress_town=endAddress_town,
+                                                        endArea=endArea, kakou=kakou, whyGo=whyGo,
+                                                        createTime=createTime,
+                                                        createDate=createTime.split(' ')[0]))
 
                         succ_count += 1
                 yqdx_fyz.objects.bulk_create(insert_dic_list)
-            except Exception as e:
-                error_list.append('手机：{0}，姓名：{1}，身份证号：{2}，错误：{3}'.format(phone, userName, idCard, repr(e)))
+                request.session['progress_message'] = '已完成同步第{0}页'.format(i)
+                request.session.save()
 
-            i += 1
-            back_dic = import_data_test(session_id, i)
-            if back_dic['count'] == 0:
-                break
+                i += 1
+                back_dic = import_data(session_id, i)
+                if back_dic['count'] == 0:
+                    break
+        except Exception as e:
+            error_list.append('手机：{0}，姓名：{1}，身份证号：{2}，错误：{3}'.format(phone, userName, idCard, repr(e)))
+        request.session['progress_message'] = '同步完成'
+        request.session.save()
         return JsonResponse({"code": 200, "msg": "同步成功,新增{0}条！".format(succ_count), "error": error_list})
 
 
@@ -423,7 +443,7 @@ def tongji_fyz(request):
     provinces_tongji_list = list()
     provinces_zengzhanglv_list = list()
     city_tongji_list = list()
-    city_zengzhanglv_list= list()
+    city_zengzhanglv_list = list()
     back_date = str()  # 返回给前端图表
     date_list = list()
 
@@ -457,13 +477,12 @@ def tongji_fyz(request):
         for date in date_list:
             num_today = 0
             if zzq_provinces_queryset.filter(startAddress_provinces=zzq_provinces, createDate=date).exists():
-
                 num_today = zzq_provinces_queryset.get(startAddress_provinces=zzq_provinces, createDate=date)['num']
             provinces_tmp_tongji += '{0},'.format(num_today)
             if num_yestoday == 0:  # 被除数不能为0
                 provinces_tmp_zengzhanglv += '0,'
             else:
-                provinces_tmp_zengzhanglv += '{:.2f},'.format((num_today - num_yestoday) / num_yestoday *100)  # 计算增长率
+                provinces_tmp_zengzhanglv += '{:.2f},'.format((num_today - num_yestoday) / num_yestoday * 100)  # 计算增长率
             num_yestoday = num_today
         provinces_tongji_list.append({'provinces': zzq_provinces, 'tongji': provinces_tmp_tongji})
         provinces_zengzhanglv_list.append({'provinces': zzq_provinces, 'zengzhanglv': provinces_tmp_zengzhanglv})
@@ -500,5 +519,6 @@ def tongji_fyz(request):
 
     return render(request, "tongji_fyz.html",
                   {'back_date': back_date, 'back_provinces': back_provinces, 'back_city': back_city,
-                   'provinces_tongji_list': provinces_tongji_list,'provinces_zengzhanglv_list':provinces_zengzhanglv_list ,'city_tongji_list': city_tongji_list,
-                   'city_zengzhanglv_list':city_zengzhanglv_list ,'quanguo_tongji_dic': quanguo_tongji_dic})
+                   'provinces_tongji_list': provinces_tongji_list,
+                   'provinces_zengzhanglv_list': provinces_zengzhanglv_list, 'city_tongji_list': city_tongji_list,
+                   'city_zengzhanglv_list': city_zengzhanglv_list, 'quanguo_tongji_dic': quanguo_tongji_dic})

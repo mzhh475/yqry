@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>(集中隔离数据库)疫情对象修改</title>
+
+    <style>
+        input{
+        size:30;
+        }
+
+    </style>
+</head>
+<body>
+<form method="post" action="yqdx_mod_db_hbz">
+    {% csrf_token %}
+    <table width="800px">
+
+        <tr><th colspan="4">（集中隔离数据库）对象信息修改</th></tr>
+        {% if msg.code == 200 %}
+        <tr><td>手机号</td><td><input type="hidden" name="id" value="{{msg.data_list.id}}"><input name="phone_no" value="{{ msg.data_list.phone_no }}" size="40"></td><td>姓名</td><td><input name="name" size="40" value="{{ msg.data_list.name }}"></td></tr>
+        <tr><td>身份证号</td><td><input size="40" name="sfzh" value="{{ msg.data_list.sfzh }}"></td><td>户籍地址</td><td>
+            <input size="40" name="hjdz" value="{{ msg.data_list.hjdz }}">
+            </td></tr>
+        <tr><td>现住地址</td><td><input size="40" name="xzdz" value="{{ msg.data_list.xzdz }}"></td><td>备注</td><td><input name="remark" size="40" value="{{ msg.data_list.remark }}"></td></tr>
+        <tr><td>数据来源</td><td><input name="from_source" size="40" value="{{ msg.data_list.from_source }}"></td><td>标签</td><td><select name="label">
+                  <option value="0" {% if msg.data_list.label == 0 %} selected {% endif %}>未处理</option>
+                  <option value="1" {% if msg.data_list.label == 1 %} selected {% endif %}>已研判排除</option>
+                  <option value="2" {% if msg.data_list.label == 2 %} selected {% endif %}>已返甬未管</option>
+                  <option value="3" {% if msg.data_list.label == 3 %} selected {% endif %}>已返甬在管</option>
+                  <option value="4" {% if msg.data_list.label == 4 %} selected {% endif %}>不返甬</option>
+                  <option value="5" {% if msg.data_list.label == 5 %} selected {% endif %}>其他</option>
+            </select>
+        </td></tr>
+        <tr>
+        <td>最后更新时间</td><td>{{ msg.data_list.timestamp|date:"Y-m-d H:i" }}</td><td></td>
+        </tr>
+
+
+        {% endif %}
+
+
+<tr><td colspan="4" align="center"><input type="submit" value="提交" id="submit">&nbsp;<input type="button" value="返回" id="back" onclick="history.go(-1)">&nbsp;<input type="reset" value="重置" id="reset"></td></tr>
+
+
+
+    </table>
+
+</form>
+
+
+</body>
+</html>

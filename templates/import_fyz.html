@@ -16,11 +16,24 @@
 
              else{
                 $("#status_div").html('同步中.....请耐心等候!')
+
+                //开始定时器
+                var timer=setInterval(function(){
+                    $.get("/get_progress_message",function(data){
+                        $("#progress_message_div").html(data);
+                    },"text");
+                },5000);
+
+                //开始执行post
                 $.post("/tongbu",$("form").serialize(),function(data){
                     if(data['code']==305){
+                    clearInterval(timer);   //停止定时器
                         alert(data['msg']);
                     }else if(data['code']==200){
-                        alert(data['msg']);
+                        clearInterval(timer);   //停止定时器
+                        //最后一次执行更新进度信息
+                        $.get("/get_progress_message",function(data){$("#progress_message_div").html(data);},"text");
+                        $("#status_div").html(data['msg']);
                         $.each(data['error'],function(i,v){
                             $("#error_div").append(v+'<br>');
 
@@ -49,6 +62,7 @@
 </form>
 <br>
 <div id="status_div"></div><br>
+<div id="progress_message_div"></div><br>
 <div id="error_div"></div>
 <a href="/">首页</a>
 </body>

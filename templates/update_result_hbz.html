@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>（在甬湖北籍去库存数据）覆盖更新结果</title>
+</head>
+<body>
+{% if msg.code == 200 %}
+
+{{msg.content}}
+
+{% endif %}
+
+<div>在甬湖北籍去库存数据更新结果
+    {% if msg.error %}
+
+    <table>
+    {% for tmp in msg.error %}
+
+        <tr><td>{{ forloop.counter }}</td><td>{{ tmp }}</td></tr>
+
+
+    {% endfor %}
+        </table>
+    {% endif %}
+
+
+
+</div>
+<a href="/">首页</a>
+</body>
+</html>

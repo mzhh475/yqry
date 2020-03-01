@@ -41,12 +41,12 @@
 <body>
 <br>
 <div align="center">
-    <table width="600px;">
-        <tr><td colspan="2">
-        <input size="60" name="search_value" id="search_value" placeholder="全库检索，支持姓名、手机、身份证其中一项，不支持模糊查询"><input type="button" value="全库检索" id="submit">
+    <table width="800px;" border="0">
+        <tr><td colspan="3">
+        <input size="90" name="search_value" id="search_value" placeholder="全库检索，支持姓名、手机、身份证其中一项，不支持模糊查询"><input type="button" value="全库检索" id="submit">
          {% csrf_token %}
         </td> </tr>
-        <tr><td colspan="2">
+        <tr><td colspan="3">
             <table id="search_result_table" border="1">
 
             </table>
@@ -93,10 +93,7 @@
                     <td><a href="/bddc_glz" target="_blank">比对导出,[导出库中数据]</a></td>
                 </tr>
             </table>
-        </td></tr>
-        <tr><td>&nbsp;</td><td></td></tr>
-        <tr>
-            <td>
+        </td><td>
                 <table border="1">
                     <tr>
                         <th>话务组数据</th>
@@ -118,6 +115,11 @@
 
                 </table>
             </td>
+
+        </tr>
+
+        <tr>
+
             <td>
                 <table border="1">
                     <tr>
@@ -141,9 +143,7 @@
                 </table>
 
 
-            </td></tr>
-        <tr><td>&nbsp;</td><td></td></tr>
-        <tr>
+            </td>
             <td>
                 <table border="1">
                     <tr>
@@ -190,10 +190,56 @@
                     </tr>
 
                 </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table border="1">
+                    <tr>
+                        <th>红黄绿码数据</th>
+                    </tr>
+                    <tr>
+                        <td><a href="/yqdx_list_hhz?page=1&size=100">显示数据</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="/dx_import_hhz" target="_blank">批量导入</a></td>
+                    </tr>
 
+                    <!--    <tr><td><a href="/back_date_whitelist" target="_blank">返回日期批量设置白名单</a></td></tr>-->
+                    <tr>
+                        <td><a href="/jjbd_hhz" target="_blank">交集比对,[导出原始比对表]</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="/bddc_hhz" target="_blank">比对导出,[导出库中数据]</a></td>
+                    </tr>
 
-            </td></tr>
+                </table>
+            </td>
+            <td>
+                <table border="1" style="float:left;">
+                <tr>
+                    <th>在甬湖北籍去库存数据</th>
+                </tr>
+                <tr>
+                    <td><a href="/yqdx_list_hbz?page=1&size=100">显示数据</a></td>
+                </tr>
+                <tr>
+                    <td><a href="/muban_upload_hbz" target="_blank">批量导入</a></td>
+                </tr>
+                <tr>
+                    <td><a href="{% url 'plbz_hbz' %}" target="_blank">批量标注</a></td>
+                </tr>
+                <tr>
+                    <td><a href="/jjbd_hbz" target="_blank">交集比对,[导出原始比对表]</a></td>
+                </tr>
+                <tr>
+                    <td><a href="/bddc_hbz" target="_blank">比对导出,[导出库中数据]</a></td>
+                </tr>
+            </table>
 
+            </td>
+            <td></td>
+        </tr>
 
 
     </table>

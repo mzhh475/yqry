@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>湖北籍在甬去库存数据-批量标注结果</title>
+</head>
+<body>
+
+{% if msg.code == 200 %}
+
+<table>
+    <tr><td>{{ msg.content }}</td></tr>
+
+    {% if msg.error %}
+    <tr><td colspan="2">以下对象还未入库，需先入库，才能批量设置名单</td></tr>
+    {% for tmp in msg.error %}
+
+        <tr><td>{{ tmp.0 }}</td><td>{{ tmp.1 }}</td></tr>
+
+
+    {% endfor %}
+    {% endif %}
+        </table>
+
+    {% elif msg.code == 305 %}
+    {{msg.error}}
+
+{% endif %}
+<br><a href='/'>首页</a><br>
+<a href="{% url 'yqdx_list_hbz' %}?page=1&size=100">返回列表</a>
+</body>
+</html>
